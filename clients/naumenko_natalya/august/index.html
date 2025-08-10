@@ -412,7 +412,7 @@ body{
 <!-- Обед 1 -->
 <div class="section recipe" id="recipe-5">
   <div class="recipe-image">
-    <img src="../../Image/lch_001.jpeg" alt="Запечённая сёмга с кабачками">
+    <img src="../../../Image/lch_001.jpeg" alt="Запечённая сёмга с кабачками">
   </div>
   <div class="recipe-content">
     <h3 class="recipe-title">Запечённая сёмга с кабачками</h3>
@@ -457,7 +457,7 @@ body{
 <!-- Обед 2 -->
 <div class="section recipe" id="recipe-6">
   <div class="recipe-image">
-    <img src="../../Image/lch_002.jpeg" alt="Овощной суп с чечевицей">
+    <img src="../../../Image/lch_002.jpeg" alt="Овощной суп с чечевицей">
   </div>
   <div class="recipe-content">
     <h3 class="recipe-title">Овощной суп с чечевицей</h3>
@@ -504,7 +504,7 @@ body{
 <!-- Обед 3 -->
 <div class="section recipe" id="recipe-7">
   <div class="recipe-image">
-    <img src="../../Image/lch_009.jpeg" alt="Овощной суп с индейкой">
+    <img src="../../../Image/lch_009.jpeg" alt="Овощной суп с индейкой">
   </div>
   <div class="recipe-content">
     <h3 class="recipe-title">Овощной суп с индейкой</h3>
@@ -550,7 +550,7 @@ body{
 <!-- Обед 4 -->
 <div class="section recipe" id="recipe-8">
   <div class="recipe-image">
-    <img src="../../Image/lch_022.jpeg" alt="Куриный суп с гречкой и овощами">
+    <img src="../../../Image/lch_022.jpeg" alt="Куриный суп с гречкой и овощами">
   </div>
   <div class="recipe-content">
     <h3 class="recipe-title">Куриный суп с гречкой и овощами</h3>
@@ -597,7 +597,7 @@ body{
 <!-- Ужин 1 -->
 <div class="section recipe" id="recipe-9">
   <div class="recipe-image">
-    <img src="../../Image/snk_001.jpeg" alt="Рыба с запечённой тыквой">
+    <img src="../../../Image/snk_001.jpeg" alt="Рыба с запечённой тыквой">
   </div>
   <div class="recipe-content">
     <h3 class="recipe-title">Рыба с запечённой тыквой</h3>
@@ -642,7 +642,7 @@ body{
 <!-- Ужин 2 -->
 <div class="section recipe" id="recipe-10">
   <div class="recipe-image">
-    <img src="../../Image/snk_005.jpeg" alt="Тёплый салат с яйцом и брокколи">
+    <img src="../../../Image/snk_005.jpeg" alt="Тёплый салат с яйцом и брокколи">
   </div>
   <div class="recipe-content">
     <h3 class="recipe-title">Тёплый салат с яйцом и брокколи</h3>
@@ -686,7 +686,7 @@ body{
 <!-- Ужин 3 -->
 <div class="section recipe" id="recipe-11">
   <div class="recipe-image">
-    <img src="../../Image/snk_011.jpeg" alt="Творог с льняным маслом и семенами">
+    <img src="../../../Image/snk_011.jpeg" alt="Творог с льняным маслом и семенами">
   </div>
   <div class="recipe-content">
     <h3 class="recipe-title">Творог с льняным маслом и семенами</h3>
@@ -728,7 +728,7 @@ body{
 <!-- Ужин 4 -->
 <div class="section recipe" id="recipe-12">
   <div class="recipe-image">
-    <img src="../../Image/snk_013.jpeg" alt="Запечённая индейка с овощами">
+    <img src="../../../Image/snk_013.jpeg" alt="Запечённая индейка с овощами">
   </div>
   <div class="recipe-content">
     <h3 class="recipe-title">Запечённая индейка с овощами</h3>
@@ -820,15 +820,25 @@ function scrollToRecipe(recipeId){
   nav.classList.remove('active');
   icon.classList.remove('active');
   document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
-  const el=document.getElementById(recipeId);
-  if(!el) return;
-  // Получаем высоту навигационной панели
-  const navHeight=document.querySelector('.nav-header').offsetHeight;
-  // Получаем позицию элемента относительно верха страницы
-  const elementPosition=el.offsetTop;
-  // Вычитаем высоту навигации и добавляем небольшой отступ
-  const offsetPosition=elementPosition-navHeight-10;
-  window.scrollTo({top:offsetPosition,behavior:'smooth'});
+  
+  // Небольшая задержка для закрытия меню
+  setTimeout(()=>{
+    const el=document.getElementById(recipeId);
+    if(!el) return;
+    
+    // Получаем позицию элемента относительно документа
+    const rect=el.getBoundingClientRect();
+    const scrollTop=window.pageYOffset || document.documentElement.scrollTop;
+    const navHeight=document.querySelector('.nav-header').offsetHeight || 60;
+    
+    // Целевая позиция с учетом высоты навигации
+    const targetPosition=rect.top + scrollTop - navHeight - 5;
+    
+    window.scrollTo({
+      top:targetPosition,
+      behavior:'smooth'
+    });
+  }, 100);
 }
 
 // Состояние чекбоксов
