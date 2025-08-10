@@ -822,9 +822,13 @@ function scrollToRecipe(recipeId){
   document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
   const el=document.getElementById(recipeId);
   if(!el) return;
-  const y=el.getBoundingClientRect().top+window.pageYOffset;
-  const offset=y-document.querySelector('.nav-header').offsetHeight;
-  window.scrollTo({top:offset,behavior:'smooth'});
+  // Получаем высоту навигационной панели
+  const navHeight=document.querySelector('.nav-header').offsetHeight;
+  // Получаем позицию элемента относительно верха страницы
+  const elementPosition=el.offsetTop;
+  // Вычитаем высоту навигации и добавляем небольшой отступ
+  const offsetPosition=elementPosition-navHeight-10;
+  window.scrollTo({top:offsetPosition,behavior:'smooth'});
 }
 
 // Состояние чекбоксов
