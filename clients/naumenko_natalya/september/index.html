@@ -254,10 +254,13 @@ icon.classList.remove('active');
 document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
 const el=document.getElementById(recipeId);
 if(!el) return;
+// Небольшая задержка для закрытия меню
+setTimeout(()=>{
 const headerHeight=document.querySelector('.nav-header').offsetHeight;
-const elementPosition=el.getBoundingClientRect().top+window.pageYOffset;
-const offsetPosition=elementPosition-headerHeight-10;
-window.scrollTo({top:offsetPosition,behavior:'smooth'});
+const elementTop=el.offsetTop;
+const scrollPosition=elementTop-headerHeight-5;
+window.scrollTo({top:scrollPosition,behavior:'smooth'});
+},100);
 }
 
 // Состояние чекбоксов
