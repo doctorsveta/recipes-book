@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Персональная книга рецептов - Наталья</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--primary-warm:#6b5d56;--secondary-warm:#8b7468;--accent-soft:#d4b5a0;--accent-light:#f0e8e0;
+--bg-cream:#fdfcfb;--bg-soft:#faf8f5;--text-main:#3a3a3a;--text-soft:#8a756b;
+--success:#7fb069;--energy:#f4a261;--calm:#a8dadc;
+}
+body{
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;font-weight:400;line-height:1.6;
+color:var(--text-main);background:var(--bg-cream);font-size:17px;-webkit-font-smoothing:antialiased;
+padding-bottom:env(safe-area-inset-bottom);
+}
+.container{max-width:450px;margin:0 auto;background:#fff;min-height:100vh}
+
+/* Шапка/навигация */
+.nav-header{
+position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+border-bottom:1px solid var(--accent-light);z-index:10001;
+}
+.nav-toggle{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;width:100%;background:transparent;border:0}
+.nav-toggle:focus-visible{outline:2px solid var(--accent-soft)}
+.nav-title{font-size:14px;font-weight:500;letter-spacing:.5px;color:var(--secondary-warm);text-transform:uppercase}
+.nav-icon{width:24px;height:24px;display:flex;flex-direction:column;justify-content:center;gap:4px;transition:.3s;pointer-events:none}
+.nav-icon span{width:100%;height:2px;background:var(--secondary-warm);transition:.3s}
+.nav-icon.active span:first-child{transform:rotate(45deg) translate(3px,3px)}
+.nav-icon.active span:last-child{transform:rotate(-45deg) translate(3px,-3px)}
+.nav-content{max-height:0;overflow:hidden;transition:max-height .3s ease;background:#fff;border-bottom:1px solid var(--accent-light)}
+.nav-content.active{max-height:60vh;overflow-y:auto}
+.nav-list{padding:10px 0}
+.nav-item{display:flex;align-items:center;padding:14px 20px;cursor:pointer;transition:.2s;border-bottom:1px solid rgba(240,232,224,.5)}
+.nav-item:last-child{border-bottom:none}
+.nav-item:active{background:var(--bg-soft)}
+.nav-recipe-name{flex:1;font-size:15px;color:var(--text-main);font-weight:400}
+.nav-badge{font-size:11px;padding:3px 10px;border-radius:12px;background:var(--accent-light);color:var(--secondary-warm);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+
+/* Секции */
+.section{padding:30px 20px;border-bottom:1px solid var(--accent-light)}
+.section:last-child{border-bottom:none}
+
+/* Обложка */
+.cover{text-align:center;padding:80px 20px;background:linear-gradient(135deg,#fff 0%,var(--bg-soft) 100%);display:flex;flex-direction:column;justify-content:center;min-height:100vh}
+.cover-subtitle{font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:300;color:var(--secondary-warm);margin-bottom:8px;letter-spacing:0.5px}
+.cover-for{font-family:Georgia,'Times New Roman',serif;font-size:16px;font-style:italic;color:var(--text-soft);margin-bottom:8px}
+.cover-name{font-family:Georgia,'Times New Roman',serif;font-size:52px;font-weight:300;color:var(--primary-warm);margin-bottom:40px;line-height:1;letter-spacing:-1px}
+.cover-dedication{margin-bottom:60px}
+.cover-dedication-line{font-size:15px;color:var(--text-soft);line-height:1.6;letter-spacing:0.3px}
+.cover-date{font-size:14px;color:#c5b4a8;letter-spacing:1.5px;text-transform:uppercase}
+
+/* Письмо */
+.letter{background:linear-gradient(to bottom,#fff,var(--bg-soft));padding:50px 25px}
+.letter-content{font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:1.7;color:var(--primary-warm)}
+.letter-content p{margin-bottom:20px}
+.letter-content p:first-child{font-weight:500}
+.letter-signature{margin-top:40px;text-align:right}
+.letter-signature-text{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--secondary-warm);font-style:italic}
+.letter-signature-name{font-family:'Brush Script MT',cursive;font-size:28px;color:var(--primary-warm);margin-top:10px;font-weight:300}
+
+/* Рецепты */
+.recipe{padding:0;background:#fff}
+.recipe-image{width:100%;height:220px;position:relative;background:repeating-linear-gradient(45deg,#f5f0ea,#f5f0ea 10px,#e8ddd5 10px,#e8ddd5 20px);overflow:hidden}
+.recipe-image img{width:100%;height:100%;object-fit:cover;display:block}
+
+.recipe-content{padding:20px}
+.recipe-title{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:400;color:var(--primary-warm);margin-bottom:8px;line-height:1.1;letter-spacing:-.3px}
+
+/* Мета-данные рецепта */
+.recipe-meta{
+display:flex;
+gap:8px;
+font-size:13px;
+color:var(--secondary-warm);
+margin-bottom:12px;
+align-items:center;
+}
+.recipe-meta span:not(:last-child)::after{
+content:'•';
+margin-left:8px;
+color:var(--accent-soft);
+}
+
+.health-benefits{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}
+.benefit-tag{display:inline-flex;align-items:center;gap:6px;background:#fff;padding:6px 12px;border-radius:6px;font-size:11px;letter-spacing:.3px;text-transform:uppercase;color:var(--secondary-warm);border:1px solid var(--accent-light)}
+.benefit-tag::before{content:'';width:4px;height:4px;background:var(--accent-soft);border-radius:50%}
+
+.recipe-personal{font-size:16px;line-height:1.65;color:#6a6a6a;margin-bottom:20px;padding:16px 16px 16px 30px;background:linear-gradient(135deg,var(--bg-soft),#fff);border-radius:10px;position:relative}
+.recipe-personal::before{content:'"';position:absolute;left:12px;top:12px;font-size:22px;color:var(--accent-soft);font-family:Georgia,serif;opacity:.5}
+
+.recipe-block{margin-bottom:22px}
+.recipe-block h4{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--secondary-warm);margin-bottom:10px;font-weight:500}
+
+.ingredients-list{list-style:none}
+.ingredients-list li{display:flex;align-items:center;margin-bottom:8px;font-size:16px;color:var(--text-main);padding:4px 0}
+.ingredient-checkbox{width:22px;height:22px;border:1.5px solid var(--accent-soft);border-radius:5px;margin-right:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.ingredient-checkbox.checked{background:var(--success);border-color:var(--success)}
+.ingredient-checkbox.checked::after{content:'✓';color:#fff;font-size:13px;font-weight:700}
+
+.steps-list{list-style:none;counter-reset:step-counter}
+.steps-list li{counter-increment:step-counter;padding-left:34px;position:relative;margin-bottom:10px;font-size:16px;line-height:1.5;color:var(--text-main);display:flex;align-items:flex-start}
+.steps-list li::before{content:counter(step-counter);position:absolute;left:0;top:2px;width:22px;height:22px;background:linear-gradient(135deg,var(--accent-soft),#c2a491);color:#fff;border-radius:5px;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
+
+/* Финал */
+.final{padding:60px 20px 40px;background:linear-gradient(135deg,#fff,var(--bg-soft))}
+
+.final-message{text-align:center;margin-bottom:50px}
+.final-message h3{font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:300;color:var(--primary-warm);margin-bottom:20px;line-height:1.3}
+.final-message p{font-size:16px;line-height:1.7;color:#6a6a6a;max-width:380px;margin:0 auto 15px}
+
+.share-section{text-align:center;margin:50px 0}
+.share-prompt{font-size:15px;color:var(--text-soft);margin-bottom:24px}
+.share-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--primary-warm);padding:14px 28px;border:1.5px solid var(--accent-soft);border-radius:12px;text-decoration:none;font-size:15px;font-weight:400;transition:all .3s;cursor:pointer}
+.share-btn:hover{background:var(--bg-soft);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.share-btn:active{transform:translateY(0)}
+.share-btn svg{width:18px;height:18px;fill:var(--primary-warm)}
+
+.final-footer{text-align:center;margin-top:60px}
+.final-signature{font-size:14px;color:var(--text-soft);margin-bottom:8px}
+.final-signature-name{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--secondary-warm);font-style:italic}
+
+/* Мелкая адаптация */
+@media (max-width:380px){
+.cover-name{font-size:42px}
+.recipe-title{font-size:22px}
+.letter-content{font-size:18px}
+}
+
+/* Печать */
+@page{size:A4;margin:12mm}
+@media print{
+body{background:#fff!important}
+.container{max-width:none;background:#fff}
+.nav-header{display:none!important}
+.section{padding:0;border:0}
+.recipe{break-inside:avoid;page-break-inside:avoid;margin:0 0 10mm 0}
+.cover{page-break-after:always}
+.final{page-break-before:always}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- Навигация -->
+<div class="nav-header">
+<button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navContent">
+<div class="nav-title">Содержание</div>
+<div class="nav-icon" id="navIcon"><span></span><span></span></div>
+</button>
+<div class="nav-content" id="navContent">
+<div class="nav-list">
+<div class="nav-item" onclick="scrollToRecipe('recipe-1')"><span class="nav-recipe-name">Тёплая гречневая каша с яйцом и зеленью</span><span class="nav-badge">завтрак</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-2')"><span class="nav-recipe-name">Овсянка с яблоком, корицей и семечками</span><span class="nav-badge">завтрак</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-3')"><span class="nav-recipe-name">Яйцо всмятку с гречкой и маслом</span><span class="nav-badge">завтрак</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-4')"><span class="nav-recipe-name">Омлет на пару с зеленью</span><span class="nav-badge">завтрак</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-5')"><span class="nav-recipe-name">Овощной суп с чечевицей</span><span class="nav-badge">обед</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-6')"><span class="nav-recipe-name">Индейка с тушёной брокколи</span><span class="nav-badge">обед</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-7')"><span class="nav-recipe-name">Запечённая сёмга с кабачками</span><span class="nav-badge">обед</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-8')"><span class="nav-recipe-name">Гречка с тушёными овощами и маслом гхи</span><span class="nav-badge">обед</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-9')"><span class="nav-recipe-name">Крем-суп из цветной капусты</span><span class="nav-badge">ужин</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-10')"><span class="nav-recipe-name">Тёплый салат с яйцом и брокколи</span><span class="nav-badge">ужин</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-11')"><span class="nav-recipe-name">Тушёная чечевица с овощами</span><span class="nav-badge">ужин</span></div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-12')"><span class="nav-recipe-name">Запечённая рыба с цветной капустой</span><span class="nav-badge">ужин</span></div>
+</div>
+</div>
+</div>
+
+<!-- Обложка -->
+<div class="section cover">
+<div>
+<div class="cover-subtitle">Книга рецептов</div>
+<div class="cover-for">для</div>
+<div class="cover-name">Натальи</div>
+</div>
+
+<div style="width: 60px; height: 1px; background: var(--accent-soft); margin: 40px auto; opacity: 0.5;"></div>
+
+<div class="cover-dedication">
+<div class="cover-dedication-line">Собрана с любовью</div>
+<div class="cover-dedication-line">для вашего здоровья и энергии</div>
+</div>
+
+<div class="cover-date">Сентябрь 2025</div>
+</div>
+
+<!-- Письмо -->
+<div class="section letter">
+<div class="letter-content">
+<p><strong>Здравствуйте, Наталья!</strong></p><p>Перед вами персональная книга рецептов на сентябрь — ваш проводник к бодрости и хорошему самочувствию. Я собрала блюда, которые помогут восстановить силы и поддержать уровень энергии через правильное питание.</p><p>Как работать с книгой: начните с 2-3 рецептов на первой неделе. Выберите те, что кажутся самыми простыми — например, гречневую кашу на завтрак и овощной суп на обед. Готовьте сразу на 2-3 дня, чтобы не тратить силы каждый день.</p><p>Обратите внимание на блюда с гречкой и чечевицей — они богаты железом и помогут справиться с усталостью. А запечённые и тушёные блюда сохраняют максимум пользы без лишней нагрузки на пищеварение.</p><p>Через две недели регулярного питания по этим рецептам вы заметите, что утром легче вставать, а днём меньше тянет на кофе и сладкое. Это первые признаки того, что организм получает нужные вещества.</p><div class="letter-signature"><div class="letter-signature-text">С заботой о вашем здоровье,</div><div class="letter-signature-name">Доктор Света</div></div>
+</div>
+</div>
+
+<!-- РЕЦЕПТЫ -->
+<div class="section recipe" id="recipe-1"><div class="recipe-image"><img src="../../../Image/brk_003.jpeg" alt="Тёплая гречневая каша с яйцом и зеленью" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Тёплая гречневая каша с яйцом и зеленью</h3><div class="recipe-meta"><span>320 ккал</span><span>20 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">ЖКТ</span></div><div class="recipe-personal">Начинайте день именно с этого блюда — сочетание гречки и яйца даст стабильную энергию до самого обеда. Сварите гречку на 3 дня вперёд и храните в контейнере, утром останется только разогреть и добавить яйцо.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-1"></span>Гречка — 3 ст.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-1"></span>Яйцо — 1 шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-1"></span>Свежая зелень — 1 ст.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-1"></span>Соль — щепотка</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Отварите промытую гречку до мягкости (15 минут).</li><li>Сварите яйцо всмятку или вкрутую.</li><li>Выложите кашу в тарелку, нарежьте яйцо, посыпьте зеленью и посолите.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-2"><div class="recipe-image"><img src="../../../Image/brk_004.jpeg" alt="Овсянка с яблоком, корицей и семечками" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Овсянка с яблоком, корицей и семечками</h3><div class="recipe-meta"><span>280 ккал</span><span>15 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">ЖКТ</span></div><div class="recipe-personal">Корица поможет контролировать тягу к сладкому, а семечки добавят полезных жиров для работы мозга. Замочите овсянку с вечера в воде — утром она сварится за 5 минут вместо 10.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-2"></span>Овсяные хлопья — 3 ст.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-2"></span>Вода или растительное молоко — 150 мл</li><li><span class="ingredient-checkbox" data-recipe="recipe-2"></span>Яблоко — ½ шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-2"></span>Корица — ½ ч.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-2"></span>Подсолнечные семечки — 1 ч.л.</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Отварите овсянку 7-10 минут на воде или молоке.</li><li>Добавьте кубики яблока, прогрейте минуту.</li><li>Посыпьте корицей и семечками, подавайте.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-3"><div class="recipe-image"><img src="../../../Image/brk_006.jpeg" alt="Яйцо всмятку с гречкой и маслом" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Яйцо всмятку с гречкой и маслом</h3><div class="recipe-meta"><span>300 ккал</span><span>15 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">сердце</span></div><div class="recipe-personal">Это блюдо особенно хорошо в дни повышенной усталости — белок яйца и железо из гречки быстро восстановят силы. Используйте оливковое масло первого отжима для максимальной пользы.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-3"></span>Яйцо — 1 шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-3"></span>Отварная гречка — 3 ст.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-3"></span>Масло (оливковое или гхи) — 1 ч.л.</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Сварите яйцо всмятку 5 минут после закипания.</li><li>Разогрейте готовую гречку, добавьте масло.</li><li>Подавайте гречку с яйцом.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-4"><div class="recipe-image"><img src="../../../Image/brk_010.jpeg" alt="Омлет на пару с зеленью" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Омлет на пару с зеленью</h3><div class="recipe-meta"><span>220 ккал</span><span>15 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">кости</span></div><div class="recipe-personal">Приготовление на пару сохраняет все полезные вещества и делает омлет особенно нежным. Если нет пароварки, готовьте в микроволновке 3-4 минуты на средней мощности — результат будет таким же.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-4"></span>Яйцо — 2 шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-4"></span>Молоко — 2 ст.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-4"></span>Соль — щепотка</li><li><span class="ingredient-checkbox" data-recipe="recipe-4"></span>Свежая зелень — 1 ст.л.</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Взбейте яйца с молоком и солью.</li><li>Добавьте рубленую зелень.</li><li>Перелейте смесь в форму и готовьте на пару 10-12 минут.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-5"><div class="recipe-image"><img src="../../../Image/lch_002.jpeg" alt="Овощной суп с чечевицей" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Овощной суп с чечевицей</h3><div class="recipe-meta"><span>320 ккал</span><span>25 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">ЖКТ</span><span class="benefit-tag">кровь</span></div><div class="recipe-personal">Красная чечевица — чемпион по содержанию железа, именно то, что нужно при вашем уровне ферритина. Сварите большую кастрюлю на 3-4 дня, суп становится только вкуснее при хранении.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-5"></span>Чечевица — 2 ст.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-5"></span>Морковь — 1 шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-5"></span>Лук — 1 шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-5"></span>Кабачок — 1 шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-5"></span>Оливковое масло — 1 ч.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-5"></span>Куркума, кориандр — по щепотке</li><li><span class="ingredient-checkbox" data-recipe="recipe-5"></span>Вода — 1 л</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Обжарьте лук и морковь в масле 2 минуты.</li><li>Добавьте кубики кабачка, чечевицу и воду.</li><li>Приправьте специями, варите 20-25 минут до мягкости.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-6"><div class="recipe-image"><img src="../../../Image/lch_003.jpeg" alt="Индейка с тушёной брокколи" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Индейка с тушёной брокколи</h3><div class="recipe-meta"><span>350 ккал</span><span>20 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">энергия</span></div><div class="recipe-personal">Индейка — идеальный белок для поддержания стабильного уровня сахара в крови, что важно для ровной энергии. Готовьте двойную порцию — холодная индейка отлично подойдёт для перекуса на следующий день.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-6"></span>Филе бедра индейки — 150 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-6"></span>Брокколи — 100 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-6"></span>Лук — ½ шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-6"></span>Оливковое масло — 1 ч.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-6"></span>Соль, перец — по вкусу</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Нарежьте индейку, обжарьте с луком 2 минуты.</li><li>Добавьте 50 мл воды, тушите под крышкой 8 минут.</li><li>Положите брокколи, готовьте ещё 7 минут до мягкости.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-7"><div class="recipe-image"><img src="../../../Image/lch_001.jpeg" alt="Запечённая сёмга с кабачками" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Запечённая сёмга с кабачками</h3><div class="recipe-meta"><span>380 ккал</span><span>25 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">сердце</span></div><div class="recipe-personal">Омега-3 из сёмги поддержит работу сердца и сосудов. Если сёмга дорогая, замените на скумбрию или сельдь — они тоже богаты полезными жирами и стоят дешевле.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-7"></span>Филе сёмги — 150 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-7"></span>Кабачок — 1 шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-7"></span>Оливковое масло — 1 ч.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-7"></span>Лимонный сок — несколько капель</li><li><span class="ingredient-checkbox" data-recipe="recipe-7"></span>Травы, соль — по вкусу</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Нарежьте кабачок кружочками, выложите на противень.</li><li>Сверху положите сёмгу, сбрызните лимоном и маслом, посыпьте травами.</li><li>Запекайте 20 минут при 180°C.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-8"><div class="recipe-image"><img src="../../../Image/lch_011.jpeg" alt="Гречка с тушёными овощами и маслом гхи" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Гречка с тушёными овощами и маслом гхи</h3><div class="recipe-meta"><span>340 ккал</span><span>20 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">ЖКТ</span></div><div class="recipe-personal">Масло гхи легче усваивается, чем обычное сливочное, и придаёт блюду приятный ореховый вкус. Это блюдо можно есть и тёплым, и холодным — берите с собой на работу в контейнере.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-8"></span>Гречка — 50 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-8"></span>Морковь — ½ шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-8"></span>Кабачок — ½ шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-8"></span>Масло гхи — 1 ч.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-8"></span>Свежая зелень — по вкусу</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Отварите гречку до готовности.</li><li>Нарежьте овощи, тушите с маслом до мягкости.</li><li>Смешайте овощи с гречкой, украсьте зеленью.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-9"><div class="recipe-image"><img src="../../../Image/snk_003.jpeg" alt="Крем-суп из цветной капусты" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Крем-суп из цветной капусты</h3><div class="recipe-meta"><span>200 ккал</span><span>20 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">ЖКТ</span></div><div class="recipe-personal">Лёгкий суп идеален для ужина — не перегружает пищеварение перед сном. Добавьте щепотку мускатного ореха для более интересного вкуса, а летом можно подавать охлаждённым.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-9"></span>Цветная капуста — 150 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-9"></span>Лук — ½ шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-9"></span>Вода или овощной бульон — 250 мл</li><li><span class="ingredient-checkbox" data-recipe="recipe-9"></span>Оливковое масло — 1 ч.л.</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Отварите капусту и лук до мягкости.</li><li>Пюрируйте блендером до кремовой консистенции.</li><li>Добавьте масло перед подачей.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-10"><div class="recipe-image"><img src="../../../Image/snk_005.jpeg" alt="Тёплый салат с яйцом и брокколи" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Тёплый салат с яйцом и брокколи</h3><div class="recipe-meta"><span>220 ккал</span><span>20 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">ЖКТ</span></div><div class="recipe-personal">Сочетание белка и клетчатки поможет проснуться утром отдохнувшей, а не разбитой. Яйца можно сварить заранее на 3-4 дня и хранить в холодильнике прямо в скорлупе.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-10"></span>Брокколи — 100 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-10"></span>Яйцо — 1 шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-10"></span>Листья салата — горсть</li><li><span class="ingredient-checkbox" data-recipe="recipe-10"></span>Оливковое масло — 1 ч.л.</li><li><span class="ingredient-checkbox" data-recipe="recipe-10"></span>Соль — щепотка</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Отварите брокколи 5 минут, яйцо вкрутую 8 минут.</li><li>Смешайте тёплые брокколи, порезанное яйцо и салат, заправьте маслом.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-11"><div class="recipe-image"><img src="../../../Image/snk_006.jpeg" alt="Тушёная чечевица с овощами" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Тушёная чечевица с овощами</h3><div class="recipe-meta"><span>280 ккал</span><span>25 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">кровь</span></div><div class="recipe-personal">Зелёная чечевица держит форму при готовке и даёт длительное чувство сытости. Куркума усиливает усвоение железа — добавляйте её во все блюда с чечевицей для максимальной пользы.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-11"></span>Зелёная чечевица — 70 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-11"></span>Морковь — ½ шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-11"></span>Кабачок — ½ шт.</li><li><span class="ingredient-checkbox" data-recipe="recipe-11"></span>Тмин, куркума — по щепотке</li><li><span class="ingredient-checkbox" data-recipe="recipe-11"></span>Вода — 300 мл</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Отварите чечевицу до мягкости.</li><li>Добавьте овощи и специи, томите 10 минут под крышкой.</li></ol></div></div></div>
+<div class="section recipe" id="recipe-12"><div class="recipe-image"><img src="../../../Image/snk_007.jpeg" alt="Запечённая рыба с цветной капустой" loading="lazy"></div><div class="recipe-content"><h3 class="recipe-title">Запечённая рыба с цветной капустой</h3><div class="recipe-meta"><span>240 ккал</span><span>25 минут</span><span>Простой</span></div><div class="health-benefits"><span class="benefit-tag">сердце</span></div><div class="recipe-personal">Треска и хек — бюджетные источники качественного белка, отлично подходят для всей семьи. Запекайте сразу 4 порции в большой форме, чтобы хватило всем на ужин.</div><div class="recipe-block"><h4>Ингредиенты</h4><ul class="ingredients-list"><li><span class="ingredient-checkbox" data-recipe="recipe-12"></span>Филе трески или хека — 130 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-12"></span>Цветная капуста — 100 г</li><li><span class="ingredient-checkbox" data-recipe="recipe-12"></span>Лимонный сок — несколько капель</li><li><span class="ingredient-checkbox" data-recipe="recipe-12"></span>Соль — по вкусу</li></ul></div><div class="recipe-block"><h4>Приготовление</h4><ol class="steps-list"><li>Разложите рыбу и капусту в форме, сбрызните лимоном.</li><li>Запекайте 20 минут при 180°C.</li></ol></div></div></div>
+
+<!-- Финальная страница -->
+<div class="section final">
+<div class="final-message">
+<h3>Ваш путь к энергии начинается сегодня</h3><p>Выберите 2-3 любимых рецепта из этой книги и готовьте их регулярно в течение недели. Когда освоитесь, добавляйте новые блюда.</p><p>Помните: восстановление энергии — это марафон, а не спринт. Дайте организму время перестроиться на новый режим питания. Желаю вам лёгкости в приготовлении и удовольствия от каждого приёма пищи!</p>
+</div>
+
+<div class="share-section">
+<div class="share-prompt">Если книга вам понравилась, поделитесь ею с близкими</div>
+<button class="share-btn" onclick="shareRecipeBook()" type="button">
+<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+<span>Поделиться с близкими</span>
+</button>
+</div>
+
+<div class="final-footer">
+<div class="final-signature">С заботой о вашем здоровье,</div>
+<div class="final-signature-name">Доктор Света</div>
+</div>
+</div>
+
+</div><!-- /.container -->
+
+<script>
+// Константы состояния
+const STATE_KEY = 'recipeBook_state_v3';
+
+// Навигация
+function toggleNav(){
+const navContent=document.getElementById('navContent');
+const navIcon=document.getElementById('navIcon');
+const toggle=document.getElementById('navToggle');
+const open=!navContent.classList.contains('active');
+navContent.classList.toggle('active');
+navIcon.classList.toggle('active');
+toggle.setAttribute('aria-expanded',open?'true':'false');
+}
+
+function scrollToRecipe(recipeId){
+const nav=document.getElementById('navContent');
+const icon=document.getElementById('navIcon');
+nav.classList.remove('active');
+icon.classList.remove('active');
+document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
+const el=document.getElementById(recipeId);
+if(!el) return;
+const y=el.getBoundingClientRect().top+window.pageYOffset;
+const offset=y-document.querySelector('.nav-header').offsetHeight;
+window.scrollTo({top:offset,behavior:'smooth'});
+}
+
+// Состояние чекбоксов
+function saveState(){
+const state={ingredients:[]};
+document.querySelectorAll('.ingredient-checkbox.checked').forEach(cb=>{
+const recipeId=cb.dataset.recipe;
+const index=Array.from(cb.parentElement.parentElement.children).indexOf(cb.parentElement);
+state.ingredients.push(`${recipeId}-${index}`);
+});
+localStorage.setItem(STATE_KEY,JSON.stringify(state));
+}
+
+function restoreState(){
+const savedRaw=localStorage.getItem(STATE_KEY);
+if(!savedRaw) return;
+try{
+const state=JSON.parse(savedRaw);
+(state.ingredients||[]).forEach(id=>{
+const [rid,idx]=id.split('-');
+const boxes=document.querySelectorAll(`.ingredient-checkbox[data-recipe="${rid}"]`);
+if(boxes[idx]) boxes[idx].classList.add('checked');
+});
+}catch(e){}
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded',()=>{
+// Навигация
+const t=document.getElementById('navToggle');
+if(t){
+t.addEventListener('click',toggleNav);
+t.addEventListener('keydown',e=>{
+if(e.key==='Enter'||e.key===' '){
+e.preventDefault();
+toggleNav();
+}
+});
+}
+
+// Чекбоксы
+document.querySelectorAll('.ingredient-checkbox').forEach(cb=>{
+cb.addEventListener('click',function(e){
+e.stopPropagation();
+this.classList.toggle('checked');
+saveState();
+});
+});
+
+// Восстановление состояния
+restoreState();
+});
+
+// Поделиться
+function shareRecipeBook(){
+if(navigator.share){
+navigator.share({
+title:'Моя книга рецептов',
+text:'Персональная книга рецептов для здорового питания',
+url:window.location.href
+}).catch(()=>{});
+}else{
+navigator.clipboard.writeText(window.location.href).then(()=>alert('Ссылка скопирована!'));
+}
+}
+</script>
+
+</body>
+</html>
