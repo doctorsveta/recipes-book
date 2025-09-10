@@ -1,1 +1,951 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Персональная книга рецептов - Наталья</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--primary-warm:#6b5d56;--secondary-warm:#8b7468;--accent-soft:#d4b5a0;--accent-light:#f0e8e0;
+--bg-cream:#fdfcfb;--bg-soft:#faf8f5;--text-main:#3a3a3a;--text-soft:#8a756b;
+--success:#7fb069;--energy:#f4a261;--calm:#a8dadc;
+}
+body{
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;font-weight:400;line-height:1.6;
+color:var(--text-main);background:var(--bg-cream);font-size:17px;-webkit-font-smoothing:antialiased;
+padding-bottom:env(safe-area-inset-bottom);
+}
+.container{max-width:450px;margin:0 auto;background:#fff;min-height:100vh}
 
+/* Шапка/навигация */
+.nav-header{
+position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+border-bottom:1px solid var(--accent-light);z-index:10001;
+}
+.nav-toggle{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;width:100%;background:transparent;border:0}
+.nav-toggle:focus-visible{outline:2px solid var(--accent-soft)}
+.nav-title{font-size:14px;font-weight:500;letter-spacing:.5px;color:var(--secondary-warm);text-transform:uppercase}
+.nav-icon{width:24px;height:24px;display:flex;flex-direction:column;justify-content:center;gap:4px;transition:.3s;pointer-events:none}
+.nav-icon span{width:100%;height:2px;background:var(--secondary-warm);transition:.3s}
+.nav-icon.active span:first-child{transform:rotate(45deg) translate(3px,3px)}
+.nav-icon.active span:last-child{transform:rotate(-45deg) translate(3px,-3px)}
+.nav-content{max-height:0;overflow:hidden;transition:max-height .3s ease;background:#fff;border-bottom:1px solid var(--accent-light)}
+.nav-content.active{max-height:60vh;overflow-y:auto}
+.nav-list{padding:10px 0}
+.nav-item{display:flex;align-items:center;padding:14px 20px;cursor:pointer;transition:.2s;border-bottom:1px solid rgba(240,232,224,.5)}
+.nav-item:last-child{border-bottom:none}
+.nav-item:active{background:var(--bg-soft)}
+.nav-recipe-name{flex:1;font-size:15px;color:var(--text-main);font-weight:400}
+.nav-badge{font-size:11px;padding:3px 10px;border-radius:12px;background:var(--accent-light);color:var(--secondary-warm);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+
+/* Секции */
+.section{padding:30px 20px;border-bottom:1px solid var(--accent-light)}
+.section:last-child{border-bottom:none}
+
+/* Обложка */
+.cover{text-align:center;padding:80px 20px;background:linear-gradient(135deg,#fff 0%,var(--bg-soft) 100%);display:flex;flex-direction:column;justify-content:center;min-height:100vh}
+.cover-subtitle{font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:300;color:var(--secondary-warm);margin-bottom:8px;letter-spacing:0.5px}
+.cover-for{font-family:Georgia,'Times New Roman',serif;font-size:16px;font-style:italic;color:var(--text-soft);margin-bottom:8px}
+.cover-name{font-family:Georgia,'Times New Roman',serif;font-size:52px;font-weight:300;color:var(--primary-warm);margin-bottom:40px;line-height:1;letter-spacing:-1px}
+.cover-dedication{margin-bottom:60px}
+.cover-dedication-line{font-size:15px;color:var(--text-soft);line-height:1.6;letter-spacing:0.3px}
+.cover-date{font-size:14px;color:#c5b4a8;letter-spacing:1.5px;text-transform:uppercase}
+
+/* Письмо */
+.letter{background:linear-gradient(to bottom,#fff,var(--bg-soft));padding:50px 25px}
+.letter-content{font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:1.7;color:var(--primary-warm)}
+.letter-content p{margin-bottom:20px}
+.letter-content p:first-child{font-weight:500}
+.letter-signature{margin-top:40px;text-align:right}
+.letter-signature-text{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--secondary-warm);font-style:italic}
+.letter-signature-name{font-family:'Brush Script MT',cursive;font-size:28px;color:var(--primary-warm);margin-top:10px;font-weight:300}
+
+/* Рецепты */
+.recipe{padding:0;background:#fff}
+.recipe-image{width:100%;height:220px;position:relative;background:repeating-linear-gradient(45deg,#f5f0ea,#f5f0ea 10px,#e8ddd5 10px,#e8ddd5 20px);overflow:hidden}
+.recipe-image img{width:100%;height:100%;object-fit:cover;display:block}
+
+.recipe-content{padding:20px}
+.recipe-title{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:400;color:var(--primary-warm);margin-bottom:8px;line-height:1.1;letter-spacing:-.3px}
+
+/* Мета-данные рецепта */
+.recipe-meta{
+display:flex;
+gap:8px;
+font-size:13px;
+color:var(--secondary-warm);
+margin-bottom:12px;
+align-items:center;
+}
+.recipe-meta span:not(:last-child)::after{
+content:'•';
+margin-left:8px;
+color:var(--accent-soft);
+}
+
+.health-benefits{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}
+.benefit-tag{display:inline-flex;align-items:center;gap:6px;background:#fff;padding:6px 12px;border-radius:6px;font-size:11px;letter-spacing:.3px;text-transform:uppercase;color:var(--secondary-warm);border:1px solid var(--accent-light)}
+.benefit-tag::before{content:'';width:4px;height:4px;background:var(--accent-soft);border-radius:50%}
+
+.recipe-personal{font-size:16px;line-height:1.65;color:#6a6a6a;margin-bottom:20px;padding:16px 16px 16px 30px;background:linear-gradient(135deg,var(--bg-soft),#fff);border-radius:10px;position:relative}
+.recipe-personal::before{content:'"';position:absolute;left:12px;top:12px;font-size:22px;color:var(--accent-soft);font-family:Georgia,serif;opacity:.5}
+
+.recipe-block{margin-bottom:22px}
+.recipe-block h4{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--secondary-warm);margin-bottom:10px;font-weight:500}
+
+.ingredients-list{list-style:none}
+.ingredients-list li{display:flex;align-items:center;margin-bottom:8px;font-size:16px;color:var(--text-main);padding:4px 0}
+.ingredient-checkbox{width:22px;height:22px;border:1.5px solid var(--accent-soft);border-radius:5px;margin-right:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.ingredient-checkbox.checked{background:var(--success);border-color:var(--success)}
+.ingredient-checkbox.checked::after{content:'✓';color:#fff;font-size:13px;font-weight:700}
+
+.steps-list{list-style:none;counter-reset:step-counter}
+.steps-list li{counter-increment:step-counter;padding-left:34px;position:relative;margin-bottom:10px;font-size:16px;line-height:1.5;color:var(--text-main);display:flex;align-items:flex-start}
+.steps-list li::before{content:counter(step-counter);position:absolute;left:0;top:2px;width:22px;height:22px;background:linear-gradient(135deg,var(--accent-soft),#c2a491);color:#fff;border-radius:5px;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
+
+/* Финал */
+.final{padding:60px 20px 40px;background:linear-gradient(135deg,#fff,var(--bg-soft))}
+
+.final-message{text-align:center;margin-bottom:50px}
+.final-message h3{font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:300;color:var(--primary-warm);margin-bottom:20px;line-height:1.3}
+.final-message p{font-size:16px;line-height:1.7;color:#6a6a6a;max-width:380px;margin:0 auto 15px}
+
+.share-section{text-align:center;margin:50px 0}
+.share-prompt{font-size:15px;color:var(--text-soft);margin-bottom:24px}
+.share-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--primary-warm);padding:14px 28px;border:1.5px solid var(--accent-soft);border-radius:12px;text-decoration:none;font-size:15px;font-weight:400;transition:all .3s;cursor:pointer}
+.share-btn:hover{background:var(--bg-soft);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.share-btn:active{transform:translateY(0)}
+.share-btn svg{width:18px;height:18px;fill:var(--primary-warm)}
+
+.final-footer{text-align:center;margin-top:60px}
+.final-signature{font-size:14px;color:var(--text-soft);margin-bottom:8px}
+.final-signature-name{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--secondary-warm);font-style:italic}
+
+/* Мелкая адаптация */
+@media (max-width:380px){
+.cover-name{font-size:42px}
+.recipe-title{font-size:22px}
+.letter-content{font-size:18px}
+}
+
+/* Печать */
+@page{size:A4;margin:12mm}
+@media print{
+body{background:#fff!important}
+.container{max-width:none;background:#fff}
+.nav-header{display:none!important}
+.section{padding:0;border:0}
+.recipe{break-inside:avoid;page-break-inside:avoid;margin:0 0 10mm 0}
+.cover{page-break-after:always}
+.final{page-break-before:always}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- Навигация -->
+<div class="nav-header">
+<button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navContent">
+<div class="nav-title">Содержание</div>
+<div class="nav-icon" id="navIcon"><span></span><span></span></div>
+</button>
+<div class="nav-content" id="navContent">
+<div class="nav-list">
+<div class="nav-item" onclick="scrollToRecipe('recipe-1')">
+<span class="nav-recipe-name">Манная каша на сливках с маслом и бананом</span>
+<span class="nav-badge">Завтрак</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-2')">
+<span class="nav-recipe-name">Омлет на пару со сметаной и сыром</span>
+<span class="nav-badge">Завтрак</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-3')">
+<span class="nav-recipe-name">Рисовая каша на молоке с тыквой и маслом</span>
+<span class="nav-badge">Завтрак</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-4')">
+<span class="nav-recipe-name">Сырники со сметаной и вареньем</span>
+<span class="nav-badge">Завтрак</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-5')">
+<span class="nav-recipe-name">Говядина тушеная в сметане с картофельным пюре</span>
+<span class="nav-badge">Обед</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-6')">
+<span class="nav-recipe-name">Куриная печень в сливках с гречкой</span>
+<span class="nav-badge">Обед</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-7')">
+<span class="nav-recipe-name">Лосось запеченный с картофелем в сливках</span>
+<span class="nav-badge">Обед</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-8')">
+<span class="nav-recipe-name">Макароны с мясным фаршем и сыром</span>
+<span class="nav-badge">Обед</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-9')">
+<span class="nav-recipe-name">Творожная запеканка со сметаной</span>
+<span class="nav-badge">Ужин</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-10')">
+<span class="nav-recipe-name">Рыбные котлеты на пару с картофельным пюре</span>
+<span class="nav-badge">Ужин</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-11')">
+<span class="nav-recipe-name">Куриное суфле с овощным пюре</span>
+<span class="nav-badge">Ужин</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe-12')">
+<span class="nav-recipe-name">Ленивые вареники со сметаной</span>
+<span class="nav-badge">Ужин</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Обложка -->
+<div class="section cover">
+<div>
+<div class="cover-subtitle">Книга рецептов</div>
+<div class="cover-for">для</div>
+<div class="cover-name">Натальи</div>
+</div>
+
+<div style="width: 60px; height: 1px; background: var(--accent-soft); margin: 40px auto; opacity: 0.5;"></div>
+
+<div class="cover-dedication">
+<div class="cover-dedication-line">Собрана с любовью</div>
+<div class="cover-dedication-line">для вашего здоровья и энергии</div>
+</div>
+
+<div class="cover-date">Ноябрь 2024</div>
+</div>
+
+<!-- Письмо -->
+<div class="section letter">
+<div class="letter-content">
+<p>Дорогая Наталья!</p>
+
+<p>Я очень рада, что вы доверили мне заботу о вашем здоровье. Эта книга создана специально для вас, чтобы помочь восстановить силы и набрать необходимый вес.</p>
+
+<p>Я знаю, что последний год был непростым, и стресс отразился на вашем самочувствии. Но хочу вас заверить — с правильным питанием мы обязательно вернем вам энергию и жизненные силы. Все рецепты в этой книге подобраны с учетом ваших особенностей: они щадящие для желудка, высококалорийные и при этом вкусные.</p>
+
+<p>Каждое блюдо — это шаг к вашему выздоровлению. Манная каша на сливках защитит желудок и даст калории, куриная печень поможет с анемией, а творожные блюда на ужин подарят спокойный сон. Готовьте с удовольствием, ешьте небольшими порциями, но часто — и уже через неделю вы почувствуете прилив сил.</p>
+
+<p>Помните: еда — это не просто топливо, это забота о себе. Каждый прием пищи — это возможность поддержать свой организм. Будьте терпеливы к себе, и результаты не заставят себя ждать.</p>
+
+<div class="letter-signature">
+<div class="letter-signature-text">С заботой о вас,</div>
+<div class="letter-signature-name">Доктор Света</div>
+</div>
+</div>
+</div>
+
+<!-- РЕЦЕПТЫ -->
+
+<!-- Рецепт 1 -->
+<div class="section recipe" id="recipe-1">
+<div class="recipe-image">
+<img src="../../../Image/brk_046.jpeg" alt="Манная каша на сливках с маслом и бананом">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Манная каша на сливках с маслом и бананом</h3>
+
+<div class="recipe-meta">
+<span>10 минут</span>
+<span>480 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Для набора веса</div>
+<div class="benefit-tag">Защита ЖКТ</div>
+<div class="benefit-tag">Быстрая энергия</div>
+</div>
+
+<div class="recipe-personal">
+Наталья, это идеальный завтрак для вас — манка обволакивает стенки желудка, защищая от рефлюкса, а сливки и масло дают необходимые калории. Банан добавит сладости и калия для сердца.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="1"></span>Манная крупа — 60г</li>
+<li><span class="ingredient-checkbox" data-recipe="1"></span>Сливки 20% — 200мл</li>
+<li><span class="ingredient-checkbox" data-recipe="1"></span>Сливочное масло — 30г</li>
+<li><span class="ingredient-checkbox" data-recipe="1"></span>Банан — 1 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="1"></span>Мед — 1 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="1"></span>Соль — щепотка</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Доведите сливки до кипения.</li>
+<li>Всыпьте манку, постоянно помешивая.</li>
+<li>Варите 5 минут до загустения.</li>
+<li>Добавьте масло и мед.</li>
+<li>Подавайте с нарезанным бананом.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 2 -->
+<div class="section recipe" id="recipe-2">
+<div class="recipe-image">
+<img src="../../../Image/brk_047.jpeg" alt="Омлет на пару со сметаной и сыром">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Омлет на пару со сметаной и сыром</h3>
+
+<div class="recipe-meta">
+<span>15 минут</span>
+<span>450 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Белок</div>
+<div class="benefit-tag">Кальций</div>
+<div class="benefit-tag">Щадящий метод</div>
+</div>
+
+<div class="recipe-personal">
+Паровой омлет — самый нежный способ приготовления яиц, идеальный для вашего желудка. Сметана и сыр увеличат калорийность, а мягкая текстура не раздражит слизистую.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="2"></span>Яйца — 3 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="2"></span>Сметана 20% — 3 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="2"></span>Молоко 3.2% — 50мл</li>
+<li><span class="ingredient-checkbox" data-recipe="2"></span>Сыр твердый — 50г</li>
+<li><span class="ingredient-checkbox" data-recipe="2"></span>Сливочное масло — 20г</li>
+<li><span class="ingredient-checkbox" data-recipe="2"></span>Соль — по вкусу</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Взбейте яйца с молоком и сметаной.</li>
+<li>Добавьте тертый сыр, соль.</li>
+<li>Смажьте форму маслом.</li>
+<li>Готовьте на пару 12-15 минут.</li>
+<li>Подавайте с дополнительной порцией масла.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 3 -->
+<div class="section recipe" id="recipe-3">
+<div class="recipe-image">
+<img src="../../../Image/brk_048.jpeg" alt="Рисовая каша на молоке с тыквой и маслом">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Рисовая каша на молоке с тыквой и маслом</h3>
+
+<div class="recipe-meta">
+<span>25 минут</span>
+<span>470 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Обволакивающее</div>
+<div class="benefit-tag">Витамин А</div>
+<div class="benefit-tag">Энергия</div>
+</div>
+
+<div class="recipe-personal">
+Разваренная рисовая каша — лучший друг желудка при гастрите. Тыква добавит витаминов и сладости, а большое количество масла поможет набрать вес.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="3"></span>Рис круглый — 70г</li>
+<li><span class="ingredient-checkbox" data-recipe="3"></span>Молоко 3.2% — 250мл</li>
+<li><span class="ingredient-checkbox" data-recipe="3"></span>Тыква — 100г</li>
+<li><span class="ingredient-checkbox" data-recipe="3"></span>Сливочное масло — 30г</li>
+<li><span class="ingredient-checkbox" data-recipe="3"></span>Сахар — 1 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="3"></span>Соль — щепотка</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Отварите рис в молоке 15 минут.</li>
+<li>Добавьте натертую тыкву.</li>
+<li>Варите еще 10 минут до кремовой консистенции.</li>
+<li>Добавьте масло и сахар.</li>
+<li>Подавайте горячей.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 4 -->
+<div class="section recipe" id="recipe-4">
+<div class="recipe-image">
+<img src="../../../Image/brk_049.jpeg" alt="Сырники со сметаной и вареньем">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Сырники со сметаной и вареньем</h3>
+
+<div class="recipe-meta">
+<span>20 минут</span>
+<span>490 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Кальций</div>
+<div class="benefit-tag">Белок</div>
+<div class="benefit-tag">Запеченные</div>
+</div>
+
+<div class="recipe-personal">
+Запекаем сырники в духовке вместо жарки — так они останутся нежными и не навредят желудку. Творог даст белок для восстановления, а сметана с вареньем — дополнительные калории.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="4"></span>Творог 9% — 200г</li>
+<li><span class="ingredient-checkbox" data-recipe="4"></span>Яйцо — 1 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="4"></span>Мука пшеничная — 2 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="4"></span>Сметана 25% — 4 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="4"></span>Варенье — 2 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="4"></span>Сахар — 1 ст.л.</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Смешайте творог, яйцо, муку и сахар.</li>
+<li>Сформируйте сырники.</li>
+<li>Запекайте в духовке 15 минут при 180°C.</li>
+<li>Подавайте со сметаной и вареньем.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 5 -->
+<div class="section recipe" id="recipe-5">
+<div class="recipe-image">
+<img src="../../../Image/lch_042.jpeg" alt="Говядина тушеная в сметане с картофельным пюре">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Говядина тушеная в сметане с картофельным пюре</h3>
+
+<div class="recipe-meta">
+<span>40 минут</span>
+<span>520 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Железо</div>
+<div class="benefit-tag">Белок</div>
+<div class="benefit-tag">Против анемии</div>
+</div>
+
+<div class="recipe-personal">
+Говядина — ваш главный помощник в борьбе с анемией. Долгое тушение сделает мясо мягким, а сметанный соус и картофельное пюре дадут необходимые калории для набора веса.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="5"></span>Говядина нежирная — 150г</li>
+<li><span class="ingredient-checkbox" data-recipe="5"></span>Картофель — 200г</li>
+<li><span class="ingredient-checkbox" data-recipe="5"></span>Сметана 20% — 3 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="5"></span>Морковь — 1 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="5"></span>Сливочное масло — 30г</li>
+<li><span class="ingredient-checkbox" data-recipe="5"></span>Молоко — 50мл</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Нарежьте говядину, потушите с морковью 30 минут.</li>
+<li>Добавьте сметану, тушите еще 10 минут.</li>
+<li>Отварите картофель, сделайте пюре с молоком и маслом.</li>
+<li>Подавайте мясо с пюре.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 6 -->
+<div class="section recipe" id="recipe-6">
+<div class="recipe-image">
+<img src="../../../Image/lch_043.jpeg" alt="Куриная печень в сливках с гречкой">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Куриная печень в сливках с гречкой</h3>
+
+<div class="recipe-meta">
+<span>25 минут</span>
+<span>480 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Максимум железа</div>
+<div class="benefit-tag">Витамин B12</div>
+<div class="benefit-tag">Фолиевая кислота</div>
+</div>
+
+<div class="recipe-personal">
+Куриная печень — рекордсмен по содержанию железа и B12, что критически важно при вашем уровне гемоглобина. Сливочный соус сделает блюдо нежным, а гречка добавит энергии.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="6"></span>Печень куриная — 200г</li>
+<li><span class="ingredient-checkbox" data-recipe="6"></span>Сливки 20% — 100мл</li>
+<li><span class="ingredient-checkbox" data-recipe="6"></span>Гречка — 70г</li>
+<li><span class="ingredient-checkbox" data-recipe="6"></span>Лук — 0.5 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="6"></span>Сливочное масло — 20г</li>
+<li><span class="ingredient-checkbox" data-recipe="6"></span>Соль, перец — по вкусу</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Отварите гречку до готовности.</li>
+<li>Потушите лук на масле до мягкости.</li>
+<li>Добавьте печень, готовьте 5 минут.</li>
+<li>Влейте сливки, тушите 5 минут.</li>
+<li>Подавайте с гречкой.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 7 -->
+<div class="section recipe" id="recipe-7">
+<div class="recipe-image">
+<img src="../../../Image/lch_044.jpeg" alt="Лосось запеченный с картофелем в сливках">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Лосось запеченный с картофелем в сливках</h3>
+
+<div class="recipe-meta">
+<span>30 минут</span>
+<span>550 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Омега-3</div>
+<div class="benefit-tag">Витамин D</div>
+<div class="benefit-tag">Полезные жиры</div>
+</div>
+
+<div class="recipe-personal">
+Жирная рыба — источник омега-3 и витамина D, важных для восстановления. Запекание в сливках сделает блюдо очень калорийным и при этом нежным для желудка.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="7"></span>Филе лосося — 150г</li>
+<li><span class="ingredient-checkbox" data-recipe="7"></span>Картофель — 200г</li>
+<li><span class="ingredient-checkbox" data-recipe="7"></span>Сливки 20% — 100мл</li>
+<li><span class="ingredient-checkbox" data-recipe="7"></span>Сливочное масло — 20г</li>
+<li><span class="ingredient-checkbox" data-recipe="7"></span>Укроп — пучок</li>
+<li><span class="ingredient-checkbox" data-recipe="7"></span>Соль — по вкусу</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Нарежьте картофель кружочками.</li>
+<li>Выложите в форму, полейте половиной сливок.</li>
+<li>Сверху положите лосось.</li>
+<li>Полейте оставшимися сливками, добавьте масло.</li>
+<li>Запекайте 25 минут при 180°C.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 8 -->
+<div class="section recipe" id="recipe-8">
+<div class="recipe-image">
+<img src="../../../Image/lch_045.jpeg" alt="Макароны с мясным фаршем и сыром">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Макароны с мясным фаршем и сыром</h3>
+
+<div class="recipe-meta">
+<span>20 минут</span>
+<span>530 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Железо</div>
+<div class="benefit-tag">Белок</div>
+<div class="benefit-tag">Высокая калорийность</div>
+</div>
+
+<div class="recipe-personal">
+Классическое сочетание макарон с мясом даст много энергии и поможет набрать вес. Фарш обеспечит железом, а сыр со сметаной добавят калорийности и кальция.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="8"></span>Макароны — 80г</li>
+<li><span class="ingredient-checkbox" data-recipe="8"></span>Фарш говяжий — 120г</li>
+<li><span class="ingredient-checkbox" data-recipe="8"></span>Сыр твердый — 50г</li>
+<li><span class="ingredient-checkbox" data-recipe="8"></span>Сметана 20% — 2 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="8"></span>Сливочное масло — 20г</li>
+<li><span class="ingredient-checkbox" data-recipe="8"></span>Соль — по вкусу</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Отварите макароны до готовности.</li>
+<li>Потушите фарш со сметаной 10 минут.</li>
+<li>Смешайте макароны с фаршем и маслом.</li>
+<li>Посыпьте тертым сыром.</li>
+<li>Подавайте горячим.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 9 -->
+<div class="section recipe" id="recipe-9">
+<div class="recipe-image">
+<img src="../../../Image/snk_039.jpeg" alt="Творожная запеканка со сметаной">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Творожная запеканка со сметаной</h3>
+
+<div class="recipe-meta">
+<span>30 минут</span>
+<span>420 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Кальций</div>
+<div class="benefit-tag">Триптофан</div>
+<div class="benefit-tag">Для сна</div>
+</div>
+
+<div class="recipe-personal">
+Творожная запеканка на ужин — источник триптофана для хорошего сна. Манка делает текстуру нежной, а жирная сметана добавляет калорий для набора веса.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="9"></span>Творог 9% — 200г</li>
+<li><span class="ingredient-checkbox" data-recipe="9"></span>Яйца — 2 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="9"></span>Манка — 2 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="9"></span>Сметана 25% — 3 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="9"></span>Сахар — 2 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="9"></span>Сливочное масло — 20г</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Смешайте творог, яйца, манку и сахар.</li>
+<li>Добавьте 2 ложки сметаны.</li>
+<li>Форму смажьте маслом.</li>
+<li>Запекайте 25 минут при 180°C.</li>
+<li>Подавайте с оставшейся сметаной.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 10 -->
+<div class="section recipe" id="recipe-10">
+<div class="recipe-image">
+<img src="../../../Image/snk_040.jpeg" alt="Рыбные котлеты на пару с картофельным пюре">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Рыбные котлеты на пару с картофельным пюре</h3>
+
+<div class="recipe-meta">
+<span>25 минут</span>
+<span>450 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Легкий белок</div>
+<div class="benefit-tag">Витамин D</div>
+<div class="benefit-tag">Щадящее</div>
+</div>
+
+<div class="recipe-personal">
+Паровые рыбные котлеты — идеальный белок на ужин, который не перегрузит пищеварение. Картофельное пюре со сливками добавит калорий и обеспечит сытость до утра.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="10"></span>Филе трески — 150г</li>
+<li><span class="ingredient-checkbox" data-recipe="10"></span>Картофель — 150г</li>
+<li><span class="ingredient-checkbox" data-recipe="10"></span>Яйцо — 0.5 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="10"></span>Сливки 20% — 50мл</li>
+<li><span class="ingredient-checkbox" data-recipe="10"></span>Сливочное масло — 30г</li>
+<li><span class="ingredient-checkbox" data-recipe="10"></span>Укроп — по вкусу</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Измельчите рыбу, добавьте яйцо, сформируйте котлеты.</li>
+<li>Готовьте на пару 15 минут.</li>
+<li>Отварите картофель, сделайте пюре со сливками и маслом.</li>
+<li>Подавайте котлеты с пюре.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 11 -->
+<div class="section recipe" id="recipe-11">
+<div class="recipe-image">
+<img src="../../../Image/snk_041.jpeg" alt="Куриное суфле с овощным пюре">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Куриное суфле с овощным пюре</h3>
+
+<div class="recipe-meta">
+<span>30 минут</span>
+<span>430 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Белок</div>
+<div class="benefit-tag">Витамины</div>
+<div class="benefit-tag">Максимально щадящее</div>
+</div>
+
+<div class="recipe-personal">
+Воздушное суфле — самая нежная форма белка, идеальная для вашего желудка. Овощное пюре добавит витаминов, а сливки обеспечат необходимую калорийность.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="11"></span>Куриное филе — 120г</li>
+<li><span class="ingredient-checkbox" data-recipe="11"></span>Яйцо — 1 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="11"></span>Сливки 20% — 50мл</li>
+<li><span class="ingredient-checkbox" data-recipe="11"></span>Морковь — 100г</li>
+<li><span class="ingredient-checkbox" data-recipe="11"></span>Кабачок — 100г</li>
+<li><span class="ingredient-checkbox" data-recipe="11"></span>Сливочное масло — 25г</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Измельчите курицу в блендере с яйцом и сливками.</li>
+<li>Готовьте на пару 20 минут.</li>
+<li>Отварите овощи, сделайте пюре с маслом.</li>
+<li>Подавайте суфле с овощным пюре.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Рецепт 12 -->
+<div class="section recipe" id="recipe-12">
+<div class="recipe-image">
+<img src="../../../Image/snk_042.jpeg" alt="Ленивые вареники со сметаной">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Ленивые вареники со сметаной</h3>
+
+<div class="recipe-meta">
+<span>15 минут</span>
+<span>460 ккал</span>
+<span>Простой</span>
+</div>
+
+<div class="health-benefits">
+<div class="benefit-tag">Кальций</div>
+<div class="benefit-tag">Белок</div>
+<div class="benefit-tag">Быстрый ужин</div>
+</div>
+
+<div class="recipe-personal">
+Ленивые вареники — простой способ получить творожный белок на ужин. Жирная сметана и масло добавят калорий, а мягкая текстура не потревожит желудок перед сном.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><span class="ingredient-checkbox" data-recipe="12"></span>Творог 9% — 200г</li>
+<li><span class="ingredient-checkbox" data-recipe="12"></span>Яйцо — 1 шт.</li>
+<li><span class="ingredient-checkbox" data-recipe="12"></span>Мука — 3 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="12"></span>Сметана 25% — 4 ст.л.</li>
+<li><span class="ingredient-checkbox" data-recipe="12"></span>Сливочное масло — 20г</li>
+<li><span class="ingredient-checkbox" data-recipe="12"></span>Сахар — 1 ст.л.</li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Смешайте творог, яйцо, муку и сахар.</li>
+<li>Сформируйте небольшие вареники.</li>
+<li>Отварите в подсоленной воде 5 минут.</li>
+<li>Подавайте со сметаной и маслом.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- Финальная страница -->
+<div class="section final">
+<div class="final-message">
+<h3>Ваш путь к здоровью начинается сегодня</h3>
+<p>Дорогая Наталья, эта книга — ваш персональный помощник на пути восстановления. Каждый рецепт подобран с заботой о вашем здоровье и учетом всех особенностей.</p>
+<p>Помните: регулярное питание небольшими порциями — ключ к успеху. Уже через неделю вы почувствуете прилив сил, а через месяц увидите первые результаты на весах.</p>
+<p>Готовьте с удовольствием, ешьте с аппетитом и будьте здоровы!</p>
+</div>
+
+<div class="share-section">
+<div class="share-prompt">Если книга вам понравилась, поделитесь ею с близкими</div>
+<button class="share-btn" onclick="shareRecipeBook()" type="button">
+<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+<span>Поделиться с близкими</span>
+</button>
+</div>
+
+<div class="final-footer">
+<div class="final-signature">С заботой о вашем здоровье,</div>
+<div class="final-signature-name">Доктор Света</div>
+</div>
+</div>
+
+</div><!-- /.container -->
+
+<script>
+// Константы состояния
+const STATE_KEY = 'recipeBook_state_v3';
+
+// Навигация
+function toggleNav(){
+const navContent=document.getElementById('navContent');
+const navIcon=document.getElementById('navIcon');
+const toggle=document.getElementById('navToggle');
+const open=!navContent.classList.contains('active');
+navContent.classList.toggle('active');
+navIcon.classList.toggle('active');
+toggle.setAttribute('aria-expanded',open?'true':'false');
+}
+
+function scrollToRecipe(recipeId){
+const nav=document.getElementById('navContent');
+const icon=document.getElementById('navIcon');
+nav.classList.remove('active');
+icon.classList.remove('active');
+document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
+const el=document.getElementById(recipeId);
+if(!el) return;
+const y=el.getBoundingClientRect().top+window.pageYOffset;
+const offset=y-document.querySelector('.nav-header').offsetHeight;
+window.scrollTo({top:offset,behavior:'smooth'});
+}
+
+// Состояние чекбоксов
+function saveState(){
+const state={ingredients:[]};
+document.querySelectorAll('.ingredient-checkbox.checked').forEach(cb=>{
+const recipeId=cb.dataset.recipe;
+const index=Array.from(cb.parentElement.parentElement.children).indexOf(cb.parentElement);
+state.ingredients.push(`${recipeId}-${index}`);
+});
+localStorage.setItem(STATE_KEY,JSON.stringify(state));
+}
+
+function restoreState(){
+const savedRaw=localStorage.getItem(STATE_KEY);
+if(!savedRaw) return;
+try{
+const state=JSON.parse(savedRaw);
+(state.ingredients||[]).forEach(id=>{
+const [rid,idx]=id.split('-');
+const boxes=document.querySelectorAll(`.ingredient-checkbox[data-recipe="${rid}"]`);
+if(boxes[idx]) boxes[idx].classList.add('checked');
+});
+}catch(e){}
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded',()=>{
+// Навигация
+const t=document.getElementById('navToggle');
+if(t){
+t.addEventListener('click',toggleNav);
+t.addEventListener('keydown',e=>{
+if(e.key==='Enter'||e.key===' '){
+e.preventDefault();
+toggleNav();
+}
+});
+}
+
+// Чекбоксы
+document.querySelectorAll('.ingredient-checkbox').forEach(cb=>{
+cb.addEventListener('click',function(e){
+e.stopPropagation();
+this.classList.toggle('checked');
+saveState();
+});
+});
+
+// Восстановление состояния
+restoreState();
+});
+
+// Поделиться
+function shareRecipeBook(){
+if(navigator.share){
+navigator.share({
+title:'Моя книга рецептов',
+text:'Персональная книга рецептов для здорового питания',
+url:window.location.href
+}).catch(()=>{});
+}else{
+navigator.clipboard.writeText(window.location.href).then(()=>alert('Ссылка скопирована!'));
+}
+}
+</script>
+
+</body>
+</html>
