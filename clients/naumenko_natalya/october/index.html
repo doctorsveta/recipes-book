@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Персональная книга рецептов - Наталья</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--primary-warm:#6b5d56;--secondary-warm:#8b7468;--accent-soft:#d4b5a0;--accent-light:#f0e8e0;
+--bg-cream:#fdfcfb;--bg-soft:#faf8f5;--text-main:#3a3a3a;--text-soft:#8a756b;
+--success:#7fb069;--energy:#f4a261;--calm:#a8dadc;
+}
+body{
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;font-weight:400;line-height:1.6;
+color:var(--text-main);background:var(--bg-cream);font-size:17px;-webkit-font-smoothing:antialiased;
+padding-bottom:env(safe-area-inset-bottom);
+}
+.container{max-width:450px;margin:0 auto;background:#fff;min-height:100vh}
+
+.nav-header{
+position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+border-bottom:1px solid var(--accent-light);z-index:10001;
+}
+.nav-toggle{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;width:100%;background:transparent;border:0}
+.nav-title{font-size:14px;font-weight:500;letter-spacing:.5px;color:var(--secondary-warm);text-transform:uppercase}
+.nav-icon{width:24px;height:24px;display:flex;flex-direction:column;justify-content:center;gap:4px;transition:.3s;pointer-events:none}
+.nav-icon span{width:100%;height:2px;background:var(--secondary-warm);transition:.3s}
+.nav-icon.active span:first-child{transform:rotate(45deg) translate(3px,3px)}
+.nav-icon.active span:last-child{transform:rotate(-45deg) translate(3px,-3px)}
+.nav-content{max-height:0;overflow:hidden;transition:max-height .3s ease;background:#fff;border-bottom:1px solid var(--accent-light)}
+.nav-content.active{max-height:60vh;overflow-y:auto}
+.nav-list{padding:10px 0}
+.nav-item{display:flex;align-items:center;padding:14px 20px;cursor:pointer;transition:.2s;border-bottom:1px solid rgba(240,232,224,.5)}
+.nav-item:last-child{border-bottom:none}
+.nav-item:active{background:var(--bg-soft)}
+.nav-recipe-name{flex:1;font-size:15px;color:var(--text-main);font-weight:400}
+.nav-badge{font-size:11px;padding:3px 10px;border-radius:12px;background:var(--accent-light);color:var(--secondary-warm);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+
+.section{padding:30px 20px;border-bottom:1px solid var(--accent-light)}
+.section:last-child{border-bottom:none}
+
+.cover{text-align:center;padding:80px 20px;background:linear-gradient(135deg,#fff 0%,var(--bg-soft) 100%);display:flex;flex-direction:column;justify-content:center;min-height:100vh}
+.cover-subtitle{font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:300;color:var(--secondary-warm);margin-bottom:8px;letter-spacing:0.5px}
+.cover-for{font-family:Georgia,'Times New Roman',serif;font-size:16px;font-style:italic;color:var(--text-soft);margin-bottom:8px}
+.cover-name{font-family:Georgia,'Times New Roman',serif;font-size:52px;font-weight:300;color:var(--primary-warm);margin-bottom:40px;line-height:1;letter-spacing:-1px}
+.cover-dedication{margin-bottom:60px}
+.cover-dedication-line{font-size:15px;color:var(--text-soft);line-height:1.6;letter-spacing:0.3px}
+.cover-date{font-size:14px;color:#c5b4a8;letter-spacing:1.5px;text-transform:uppercase}
+
+.letter{background:linear-gradient(to bottom,#fff,var(--bg-soft));padding:50px 25px}
+.letter-content{font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:1.7;color:var(--primary-warm)}
+.letter-content p{margin-bottom:20px}
+.letter-content p:first-child{font-weight:500}
+.letter-signature{margin-top:40px;text-align:right}
+.letter-signature-text{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--secondary-warm);font-style:italic}
+.letter-signature-name{font-family:'Brush Script MT',cursive;font-size:28px;color:var(--primary-warm);margin-top:10px;font-weight:300}
+
+.recipe{padding:0;background:#fff}
+.recipe-image{width:100%;height:220px;position:relative;background:repeating-linear-gradient(45deg,#f5f0ea,#f5f0ea 10px,#e8ddd5 10px,#e8ddd5 20px);overflow:hidden}
+.recipe-image img{width:100%;height:100%;object-fit:cover;display:block}
+
+.recipe-content{padding:20px}
+.recipe-title{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:400;color:var(--primary-warm);margin-bottom:8px;line-height:1.1;letter-spacing:-.3px}
+
+.recipe-meta{
+display:flex;
+gap:8px;
+font-size:13px;
+color:var(--secondary-warm);
+margin-bottom:12px;
+align-items:center;
+}
+.recipe-meta span:not(:last-child)::after{
+content:'•';
+margin-left:8px;
+color:var(--accent-soft);
+}
+
+.health-benefits{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}
+.benefit-tag{display:inline-flex;align-items:center;gap:6px;background:#fff;padding:6px 12px;border-radius:6px;font-size:11px;letter-spacing:.3px;text-transform:uppercase;color:var(--secondary-warm);border:1px solid var(--accent-light)}
+.benefit-tag::before{content:'';width:4px;height:4px;background:var(--accent-soft);border-radius:50%}
+
+.recipe-personal{font-size:16px;line-height:1.65;color:#6a6a6a;margin-bottom:20px;padding:16px 16px 16px 30px;background:linear-gradient(135deg,var(--bg-soft),#fff);border-radius:10px;position:relative}
+.recipe-personal::before{content:'"';position:absolute;left:12px;top:12px;font-size:22px;color:var(--accent-soft);font-family:Georgia,serif;opacity:.5}
+
+.recipe-block{margin-bottom:22px}
+.recipe-block h4{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--secondary-warm);margin-bottom:10px;font-weight:500}
+
+.ingredients-list{list-style:none}
+.ingredients-list li{display:flex;align-items:center;margin-bottom:8px;font-size:16px;color:var(--text-main);padding:4px 0}
+.ingredient-checkbox{width:22px;height:22px;border:1.5px solid var(--accent-soft);border-radius:5px;margin-right:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.ingredient-checkbox.checked{background:var(--success);border-color:var(--success)}
+.ingredient-checkbox.checked::after{content:'✓';color:#fff;font-size:13px;font-weight:700}
+
+.steps-list{list-style:none;counter-reset:step-counter}
+.steps-list li{counter-increment:step-counter;padding-left:34px;position:relative;margin-bottom:10px;font-size:16px;line-height:1.5;color:var(--text-main);display:flex;align-items:flex-start}
+.steps-list li::before{content:counter(step-counter);position:absolute;left:0;top:2px;width:22px;height:22px;background:linear-gradient(135deg,var(--accent-soft),#c2a491);color:#fff;border-radius:5px;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
+
+.final{padding:60px 20px 40px;background:linear-gradient(135deg,#fff,var(--bg-soft))}
+
+.final-message{text-align:center;margin-bottom:50px}
+.final-message h3{font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:300;color:var(--primary-warm);margin-bottom:20px;line-height:1.3}
+.final-message p{font-size:16px;line-height:1.7;color:#6a6a6a;max-width:380px;margin:0 auto 15px}
+
+.share-section{text-align:center;margin:50px 0}
+.share-prompt{font-size:15px;color:var(--text-soft);margin-bottom:24px}
+.share-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--primary-warm);padding:14px 28px;border:1.5px solid var(--accent-soft);border-radius:12px;text-decoration:none;font-size:15px;font-weight:400;transition:all .3s;cursor:pointer}
+.share-btn:hover{background:var(--bg-soft);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.share-btn:active{transform:translateY(0)}
+.share-btn svg{width:18px;height:18px;fill:var(--primary-warm)}
+
+.final-footer{text-align:center;margin-top:60px}
+.final-signature{font-size:14px;color:var(--text-soft);margin-bottom:8px}
+.final-signature-name{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--secondary-warm);font-style:italic}
+
+@media (max-width:380px){
+.cover-name{font-size:42px}
+.recipe-title{font-size:22px}
+.letter-content{font-size:18px}
+}
+
+@page{size:A4;margin:12mm}
+@media print{
+body{background:#fff!important}
+.container{max-width:none;background:#fff}
+.nav-header{display:none!important}
+.section{padding:0;border:0}
+.recipe{break-inside:avoid;page-break-inside:avoid;margin:0 0 10mm 0}
+.cover{page-break-after:always}
+.final{page-break-before:always}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="nav-header">
+<button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navContent">
+<div class="nav-title">Содержание</div>
+<div class="nav-icon" id="navIcon"><span></span><span></span></div>
+</button>
+<div class="nav-content" id="navContent">
+<div class="nav-list">
+<div class="nav-item" onclick="scrollToRecipe('brk_051')">
+<span class="nav-recipe-name">Гречка с яйцом и грибами</span>
+<span class="nav-badge">Завтрак</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('brk_052')">
+<span class="nav-recipe-name">Яичница с фасолью</span>
+<span class="nav-badge">Завтрак</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('brk_053')">
+<span class="nav-recipe-name">Овсянка с яблоком</span>
+<span class="nav-badge">Завтрак</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('brk_054')">
+<span class="nav-recipe-name">Омлет с брокколи</span>
+<span class="nav-badge">Завтрак</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('lch_051')">
+<span class="nav-recipe-name">Паштет из печени</span>
+<span class="nav-badge">Обед</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('lch_052')">
+<span class="nav-recipe-name">Печень с перцем</span>
+<span class="nav-badge">Обед</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('lch_053')">
+<span class="nav-recipe-name">Телятина с овощами</span>
+<span class="nav-badge">Обед</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('lch_054')">
+<span class="nav-recipe-name">Салат с гранатом</span>
+<span class="nav-badge">Обед</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('dnr_051')">
+<span class="nav-recipe-name">Индейка с брокколи</span>
+<span class="nav-badge">Ужин</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('dnr_052')">
+<span class="nav-recipe-name">Творог с яблоком</span>
+<span class="nav-badge">Ужин</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('dnr_053')">
+<span class="nav-recipe-name">Салат с чечевицей</span>
+<span class="nav-badge">Ужин</span>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('dnr_054')">
+<span class="nav-recipe-name">Салат со шпинатом</span>
+<span class="nav-badge">Ужин</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="section cover">
+<div>
+<div class="cover-subtitle">Книга рецептов</div>
+<div class="cover-for">для</div>
+<div class="cover-name">Натальи</div>
+</div>
+
+<div style="width: 60px; height: 1px; background: var(--accent-soft); margin: 40px auto; opacity: 0.5;"></div>
+
+<div class="cover-dedication">
+<div class="cover-dedication-line">Собрана с любовью</div>
+<div class="cover-dedication-line">для вашего здоровья и энергии</div>
+</div>
+
+<div class="cover-date">Октябрь 2025</div>
+</div>
+
+<div class="section letter">
+<div class="letter-content">
+<p>Дорогая Наталья!</p>
+
+<p>Пять месяцев работы — и результаты говорят сами за себя. Гемоглобин держится на 110, спина больше не напоминает о себе, сон крепкий, кожа сияющая. Внутренняя радость стала постоянным спутником — это лучший показатель здоровья.</p>
+
+<p>Октябрь — время особого внимания к ферритину. После обильных месячных в сентябре он упал до 12.6, а это фундамент, на котором держится гемоглобин. Без достаточных запасов железа весь прогресс может откатиться назад.</p>
+
+<p>Собрала для вас 12 рецептов-помощников: максимум гемового железа из печени и мяса, плюс витамин С для усвоения. Говяжья печень даёт рекордные 30мг железа на порцию, красный перец и гранаты обеспечивают витамин С, а ваша любимая брокколи поддерживает гормональный баланс.</p>
+
+<p>Урожай в разгаре — тыква, яблоки, гранаты сейчас на пике пользы и вкуса. Готовьте с радостью, вовлекайте семью. Каждое блюдо — шаг к восстановлению запасов железа.</p>
+
+<p>Держите темп. К концу месяца увидим сдвиги в ферритине!</p>
+
+<div class="letter-signature">
+<div class="letter-signature-text">С заботой о вашем здоровье,</div>
+<div class="letter-signature-name">Доктор Света</div>
+</div>
+</div>
+</div>
+
+<!-- ЗАВТРАКИ -->
+
+<div class="section recipe" id="brk_051">
+<div class="recipe-image">
+<img src="../../../Image/brk_051.jpeg" alt="Гречка с яйцом и грибами">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Гречневая каша с яйцом и грибами</h3>
+<div class="recipe-meta">
+<span>310 ккал</span>
+<span>15 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Энергия</span>
+</div>
+<div class="recipe-personal">
+Гречка — ваша ежедневная база для железа. Грибы добавляют цинк для лучшего усвоения, яйцо даёт белок на всё утро. Сытный завтрак, который держит энергию до обеда без провалов.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="brk_051"></div><span>Гречка — 60г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_051"></div><span>Шампиньоны — 80г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_051"></div><span>Яйцо — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_051"></div><span>Лук — 0.5 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_051"></div><span>Оливковое масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_051"></div><span>Зелень — по вкусу</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_051"></div><span>Соль, перец — по вкусу</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Отварите гречку до готовности (15 минут).</li>
+<li>Грибы и лук нарежьте, обжарьте 5 минут.</li>
+<li>Яйцо сварите всмятку или вкрутую.</li>
+<li>Выложите кашу, сверху грибы и яйцо, посыпьте зеленью.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="brk_052">
+<div class="recipe-image">
+<img src="../../../Image/brk_052.jpeg" alt="Яичница с фасолью">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Яичница с красной фасолью и помидорами</h3>
+<div class="recipe-meta">
+<span>280 ккал</span>
+<span>10 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Белок</span>
+</div>
+<div class="recipe-personal">
+Красная фасоль — рекордсмен по растительному железу среди бобовых. Яйца дают белок на всё утро. Готовится за 10 минут, идеально перед стоячей сменой. Белок + железо держат энергию стабильно до обеда без провалов.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="brk_052"></div><span>Яйца — 2 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_052"></div><span>Красная фасоль консервированная — 80г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_052"></div><span>Помидор — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_052"></div><span>Оливковое масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_052"></div><span>Зелень — по вкусу</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_052"></div><span>Соль, перец — по вкусу</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Разогрейте фасоль с нарезанным помидором.</li>
+<li>Сделайте углубления, разбейте яйца.</li>
+<li>Готовьте под крышкой 4-5 минуты.</li>
+<li>Посыпьте зеленью и подавайте.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="brk_053">
+<div class="recipe-image">
+<img src="../../../Image/brk_053.jpeg" alt="Овсянка с яблоком">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Овсянка с запечённым яблоком и корицей</h3>
+<div class="recipe-meta">
+<span>260 ккал</span>
+<span>12 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Клетчатка</span>
+</div>
+<div class="recipe-personal">
+Знаю, что овсянка — одна из любимых. Октябрьские яблоки сейчас в самом соку, железо для крови, клетчатка для пищеварения. Яблоко можно запечь с вечера вместе с творогом — сразу два завтрака готовы.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="brk_053"></div><span>Овсянка — 50г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_053"></div><span>Яблоко — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_053"></div><span>Миндаль — 10г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_053"></div><span>Корица — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_053"></div><span>Вода — 200мл</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_053"></div><span>Мед — 1 ч.л.</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Яблоко нарежьте дольками, посыпьте корицей, запеките 7 минут при 180°C.</li>
+<li>Сварите овсянку на воде 5 минут.</li>
+<li>Выложите яблоко поверх каши.</li>
+<li>Посыпьте рубленым миндалём, добавьте мёд.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="brk_054">
+<div class="recipe-image">
+<img src="../../../Image/brk_054.jpeg" alt="Омлет с брокколи">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Омлет с брокколи и сыром фета</h3>
+<div class="recipe-meta">
+<span>270 ккал</span>
+<span>10 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Гормоны</span>
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Белок</span>
+</div>
+<div class="recipe-personal">
+Брокколи + фета — индолы для контроля миомы, железо для крови. Брокколи уже стала частым гостем на вашей кухне, вот новая версия омлета. Готовится за 10 минут.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="brk_054"></div><span>Яйца — 2 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_054"></div><span>Брокколи свежая — 80г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_054"></div><span>Сыр фета — 30г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_054"></div><span>Оливковое масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_054"></div><span>Укроп — по вкусу</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_054"></div><span>Соль, перец — по вкусу</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Брокколи разберите на мелкие соцветия, бланшируйте 2 минуты.</li>
+<li>Взбейте яйца с солью и перцем.</li>
+<li>На сковороде обжарьте брокколи 1 минуту.</li>
+<li>Залейте яйцами, сверху раскрошите фету, готовьте под крышкой 3-4 минуты.</li>
+<li>Посыпьте укропом перед подачей.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- ОБЕДЫ -->
+
+<div class="section recipe" id="lch_051">
+<div class="recipe-image">
+<img src="../../../Image/lch_051.jpeg" alt="Паштет из печени">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Паштет из говяжьей печени с брокколи и орехами</h3>
+<div class="recipe-meta">
+<span>320 ккал</span>
+<span>30 минут</span>
+<span>Средний</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Кровь</span>
+<span class="benefit-tag">Энергия</span>
+</div>
+<div class="recipe-personal">
+Чемпион по железу — 30мг на 100г говяжьей печени. Это максимум из всех продуктов. Брокколи добавляет индолы для миомы и смягчает вкус печени. Готовите один раз в воскресенье — хватает на 5 дней. Подходит всей семье, можно брать с собой на работу.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты (на 4 порции)</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Печень говяжья — 500г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Брокколи свежая — 200г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Лук репчатый — 2 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Морковь — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Грецкие орехи — 50г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Сливочное масло 82% — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Сливки 10% — 100мл</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Лавровый лист — 2 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Тимьян — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Соль, перец — по вкусу</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_051"></div><span>Оливковое масло — 2 ст.л.</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Печень вымочите в молоке 30 минут, обсушите, удалите плёнки.</li>
+<li>Брокколи бланшируйте 3 минуты, откиньте на дуршлаг.</li>
+<li>Лук и морковь обжарьте 5 минут до мягкости.</li>
+<li>Добавьте печень, лавровый лист, тимьян, готовьте 10 минут.</li>
+<li>Уберите лавровый лист, переложите в блендер, добавьте брокколи, орехи, масло, сливки.</li>
+<li>Пробейте до кремовой текстуры, посолите, поперчите.</li>
+<li>Переложите в контейнер, охладите минимум 3 часа.</li>
+<li>Подавайте с хлебцами или овощами.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="lch_052">
+<div class="recipe-image">
+<img src="../../../Image/lch_052.jpeg" alt="Печень с перцем">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Печень куриная в томатном соусе с запечённым перцем</h3>
+<div class="recipe-meta">
+<span>310 ккал</span>
+<span>30 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Кровь</span>
+<span class="benefit-tag">Иммунитет</span>
+</div>
+<div class="recipe-personal">
+Два продукта, которые едите часто: запечённый перец и печень. Куриная печень — 17мг железа, перец добавляет витамин С для максимального усвоения, брокколи даёт индолы для миомы. После путешествия самое время вернуться к домашним проверенным блюдам.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты (на 2 порции)</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Печень куриная — 400г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Болгарский перец красный — 3 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Помидоры свежие — 3 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Брокколи свежая — 200г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Лук репчатый — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Чеснок — 3 зубчика</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Томатная паста — 2 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Оливковое масло — 2 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Базилик — 5 листьев</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Паприка — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Тимьян — 1/2 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_052"></div><span>Лимонный сок — 1 ст.л.</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Перцы запеките целиком при 200°C 25 минут, положите в пакет на 10 минут, снимите кожицу, нарежьте.</li>
+<li>Брокколи бланшируйте 3 минуты.</li>
+<li>Печень промойте, удалите жёлчные протоки.</li>
+<li>Помидоры ошпарьте, снимите кожицу, нарежьте кубиками.</li>
+<li>Обжарьте лук и чеснок 3 минуты.</li>
+<li>Добавьте печень, жарьте 5 минут.</li>
+<li>Добавьте помидоры, пасту, специи, 100мл воды, тушите 10 минут.</li>
+<li>За 3 минуты до готовности добавьте перец и брокколи.</li>
+<li>В конце влейте лимонный сок, посыпьте базиликом.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="lch_053">
+<div class="recipe-image">
+<img src="../../../Image/lch_053.jpeg" alt="Телятина с овощами">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Телятина тушеная с цветными овощами</h3>
+<div class="recipe-meta">
+<span>350 ккал</span>
+<span>25 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Энергия</span>
+</div>
+<div class="recipe-personal">
+Телятина нежнее говядины, даёт хорошую порцию железа. Цветные овощи — каротин для кожи, витамин С для усвоения железа. Готовится быстро (25 минут), подходит для будних дней. Можно готовить на 2 дня вперёд.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="lch_053"></div><span>Телятина нежирная — 120г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_053"></div><span>Перец болгарский — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_053"></div><span>Морковь — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_053"></div><span>Брокколи — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_053"></div><span>Лук — 0.5 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_053"></div><span>Томатная паста — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_053"></div><span>Вода — 200мл</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_053"></div><span>Соль, перец — по вкусу</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Нарежьте телятину, обжарьте 3 минуты.</li>
+<li>Добавьте нарезанные овощи, томатную пасту, воду.</li>
+<li>Тушите под крышкой 20 минут до готовности.</li>
+<li>Подавайте с зеленью.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="lch_054">
+<div class="recipe-image">
+<img src="../../../Image/lch_054.jpeg" alt="Салат с гранатом">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Салат с гранатом, киви и курицей</h3>
+<div class="recipe-meta">
+<span>290 ккал</span>
+<span>15 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Иммунитет</span>
+<span class="benefit-tag">Витамин С</span>
+</div>
+<div class="recipe-personal">
+Салат с гранатом и киви, теперь с курицей для сытости. Гранат + киви — двойной удар по витамину С, железо из курицы и зелени усваивается на максимум. Обновлённая версия проверенного рецепта.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Куриное филе отварное — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Гранат — 100г (зёрна)</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Киви — 2 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Шпинат свежий — 50г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Руккола — 30г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Петрушка — пучок</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Грецкие орехи — 20г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Оливковое масло — 1 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Лимонный сок — 1 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_054"></div><span>Соль, перец — по вкусу</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Куриное филе нарежьте кубиками.</li>
+<li>Киви очистите, нарежьте кубиками.</li>
+<li>Шпинат и рукколу промойте, обсушите.</li>
+<li>Смешайте зелень, курицу, киви, зёрна граната.</li>
+<li>Добавьте рубленые орехи и петрушку.</li>
+<li>Заправьте маслом и лимонным соком, посолите.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- УЖИНЫ -->
+
+<div class="section recipe" id="dnr_051">
+<div class="recipe-image">
+<img src="../../../Image/dnr_051.jpeg" alt="Индейка с брокколи">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Индейка с брокколи на пару</h3>
+<div class="recipe-meta">
+<span>220 ккал</span>
+<span>20 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Белок</span>
+<span class="benefit-tag">Сон</span>
+</div>
+<div class="recipe-personal">
+Триптофан из индейки помогает заснуть быстро, особенно в сочетании с вечерней дыхательной гимнастикой. Брокколи на ужин — индолы работают ночью, пока вы спите, помогают контролировать миому. Лёгкое блюдо, которое не перегружает перед сном.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="dnr_051"></div><span>Филе индейки — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_051"></div><span>Брокколи — 150г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_051"></div><span>Лимонный сок — 1 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_051"></div><span>Оливковое масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_051"></div><span>Соль, травы — по вкусу</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Нарежьте индейку небольшими кусочками.</li>
+<li>Разберите брокколи на соцветия.</li>
+<li>Готовьте на пару 15 минут.</li>
+<li>Полейте лимонным соком и маслом.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="dnr_052">
+<div class="recipe-image">
+<img src="../../../Image/dnr_052.jpeg" alt="Творог с яблоком">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Творог с запечённым яблоком и грецкими орехами</h3>
+<div class="recipe-meta">
+<span>260 ккал</span>
+<span>20 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Гормоны</span>
+<span class="benefit-tag">Сон</span>
+<span class="benefit-tag">Кальций</span>
+</div>
+<div class="recipe-personal">
+Творог + запечённое яблоко, теперь с семенами льна для гормонального баланса и грецкими орехами для омега-3. Октябрьские яблоки сладкие, мёда можно меньше. Воскресное блюдо, которое любит вся семья.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="dnr_052"></div><span>Творог 5% — 150г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_052"></div><span>Яблоко — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_052"></div><span>Грецкие орехи — 15г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_052"></div><span>Семена льна молотые — 1 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_052"></div><span>Корица — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_052"></div><span>Мед — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_052"></div><span>Ванилин — щепотка</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Яблоко разрежьте пополам, удалите сердцевину.</li>
+<li>Посыпьте корицей, запеките 15 минут при 180°C до мягкости.</li>
+<li>Творог смешайте с семенами льна, ванилином.</li>
+<li>Выложите творог в тарелку, сверху тёплое яблоко.</li>
+<li>Посыпьте рублеными орехами, добавьте мёд.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="dnr_053">
+<div class="recipe-image">
+<img src="../../../Image/dnr_053.jpeg" alt="Салат с чечевицей">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Теплый салат с чечевицей и овощами</h3>
+<div class="recipe-meta">
+<span>250 ккал</span>
+<span>20 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Клетчатка</span>
+</div>
+<div class="recipe-personal">
+Знаю, что тёплые салаты любите. Чечевица — растительное железо в большом количестве, плюс клетчатка для пищеварения. Льняное масло добавляет омега-3. Можно использовать консервированную чечевицу — тогда 10 минут и готово.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="dnr_053"></div><span>Зеленая чечевица — 80г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_053"></div><span>Морковь — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_053"></div><span>Сельдерей — 1 стебель</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_053"></div><span>Шпинат свежий — 30г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_053"></div><span>Петрушка — горсть</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_053"></div><span>Льняное масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_053"></div><span>Лимонный сок — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_053"></div><span>Соль, перец — по вкусу</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Отварите чечевицу до готовности (или используйте консервированную).</li>
+<li>Обжарьте нарезанные морковь и сельдерей 5 минут.</li>
+<li>Добавьте шпинат, готовьте 1 минуту до увядания.</li>
+<li>Смешайте с чечевицей и петрушкой.</li>
+<li>Заправьте льняным маслом и лимонным соком.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="dnr_054">
+<div class="recipe-image">
+<img src="../../../Image/dnr_054.jpeg" alt="Салат со шпинатом">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Салат из шпината с авокадо и грецкими орехами</h3>
+<div class="recipe-meta">
+<span>230 ккал</span>
+<span>10 минут</span>
+<span>Простой</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Магний</span>
+<span class="benefit-tag">Сон</span>
+</div>
+<div class="recipe-personal">
+Шпинат — источник железа для крови, авокадо — полезные жиры для гормонов, орехи — магний для спокойного сна. Готовится за 10 минут, идеально после рабочего дня на ногах. Лёгкий салат, который не перегружает вечером.
+</div>
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="dnr_054"></div><span>Шпинат свежий — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_054"></div><span>Авокадо — 0.5 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_054"></div><span>Грецкие орехи — 20г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_054"></div><span>Сыр фета — 30г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_054"></div><span>Огурец — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_054"></div><span>Оливковое масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_054"></div><span>Лимонный сок — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="dnr_054"></div><span>Соль, перец — по вкусу</span></li>
+</ul>
+</div>
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Промойте и обсушите шпинат.</li>
+<li>Авокадо и огурец нарежьте кубиками.</li>
+<li>Покрошите орехи и сыр.</li>
+<li>Смешайте все ингредиенты.</li>
+<li>Заправьте маслом и лимонным соком.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<!-- ФИНАЛ -->
+
+<div class="section final">
+<div class="final-message">
+<h3>Октябрь — месяц запасов железа</h3>
+<p>Ферритин сейчас 12.6, нужно поднять хотя бы до 20-25. Печень 3-4 раза в неделю, витамин С с каждым приёмом железа — это ваши главные инструменты. Анализы в ноябре покажут, как сработала стратегия.</p>
+<p>Готовьте с радостью. Вы справляетесь отлично!</p>
+</div>
+
+<div class="share-section">
+<div class="share-prompt">Если книга вам понравилась, поделитесь ею с близкими</div>
+<button class="share-btn" onclick="shareRecipeBook()" type="button">
+<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+<span>Поделиться с близкими</span>
+</button>
+</div>
+
+<div class="final-footer">
+<div class="final-signature">С заботой о вашем здоровье,</div>
+<div class="final-signature-name">Доктор Света</div>
+</div>
+</div>
+
+</div>
+
+<script>
+const STATE_KEY = 'recipeBook_state_v3';
+
+function toggleNav(){
+const navContent=document.getElementById('navContent');
+const navIcon=document.getElementById('navIcon');
+const toggle=document.getElementById('navToggle');
+const open=!navContent.classList.contains('active');
+navContent.classList.toggle('active');
+navIcon.classList.toggle('active');
+toggle.setAttribute('aria-expanded',open?'true':'false');
+}
+
+function scrollToRecipe(recipeId){
+const nav=document.getElementById('navContent');
+const icon=document.getElementById('navIcon');
+nav.classList.remove('active');
+icon.classList.remove('active');
+document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
+const el=document.getElementById(recipeId);
+if(!el) return;
+const y=el.getBoundingClientRect().top+window.pageYOffset;
+const offset=y-document.querySelector('.nav-header').offsetHeight;
+window.scrollTo({top:offset,behavior:'smooth'});
+}
+
+function saveState(){
+const state={ingredients:[]};
+document.querySelectorAll('.ingredient-checkbox.checked').forEach(cb=>{
+const recipeId=cb.dataset.recipe;
+const index=Array.from(cb.parentElement.parentElement.children).indexOf(cb.parentElement);
+state.ingredients.push(`${recipeId}-${index}`);
+});
+localStorage.setItem(STATE_KEY,JSON.stringify(state));
+}
+
+function restoreState(){
+const savedRaw=localStorage.getItem(STATE_KEY);
+if(!savedRaw) return;
+try{
+const state=JSON.parse(savedRaw);
+(state.ingredients||[]).forEach(id=>{
+const [rid,idx]=id.split('-');
+const boxes=document.querySelectorAll(`.ingredient-checkbox[data-recipe="${rid}"]`);
+if(boxes[idx]) boxes[idx].classList.add('checked');
+});
+}catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+const t=document.getElementById('navToggle');
+if(t){
+t.addEventListener('click',toggleNav);
+t.addEventListener('keydown',e=>{
+if(e.key==='Enter'||e.key===' '){
+e.preventDefault();
+toggleNav();
+}
+});
+}
+
+document.querySelectorAll('.ingredient-checkbox').forEach(cb=>{
+cb.addEventListener('click',function(e){
+e.stopPropagation();
+this.classList.toggle('checked');
+saveState();
+});
+});
+
+restoreState();
+});
+
+function shareRecipeBook(){
+if(navigator.share){
+navigator.share({
+title:'Моя книга рецептов',
+text:'Персональная книга рецептов для здорового питания',
+url:window.location.href
+}).catch(()=>{});
+}else{
+navigator.clipboard.writeText(window.location.href).then(()=>alert('Ссылка скопирована!'));
+}
+}
+</script>
+
+</body>
+</html>
