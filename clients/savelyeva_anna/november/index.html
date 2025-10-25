@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Персональная книга рецептов - Анна Савельева</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--primary-warm:#6b5d56;--secondary-warm:#8b7468;--accent-soft:#d4b5a0;--accent-light:#f0e8e0;
+--bg-cream:#fdfcfb;--bg-soft:#faf8f5;--text-main:#3a3a3a;--text-soft:#8a756b;
+--success:#7fb069;--energy:#f4a261;--calm:#a8dadc;
+}
+body{
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;font-weight:400;line-height:1.6;
+color:var(--text-main);background:var(--bg-cream);font-size:17px;-webkit-font-smoothing:antialiased;
+padding-bottom:env(safe-area-inset-bottom);
+}
+.container{max-width:450px;margin:0 auto;background:#fff;min-height:100vh}
+
+.nav-header{
+position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+border-bottom:1px solid var(--accent-light);z-index:10001;
+}
+.nav-toggle{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;width:100%;background:transparent;border:0}
+.nav-toggle:focus-visible{outline:2px solid var(--accent-soft)}
+.nav-title{font-size:14px;font-weight:500;letter-spacing:.5px;color:var(--secondary-warm);text-transform:uppercase}
+.nav-icon{width:24px;height:24px;display:flex;flex-direction:column;justify-content:center;gap:4px;transition:.3s;pointer-events:none}
+.nav-icon span{width:100%;height:2px;background:var(--secondary-warm);transition:.3s}
+.nav-icon.active span:first-child{transform:rotate(45deg) translate(3px,3px)}
+.nav-icon.active span:last-child{transform:rotate(-45deg) translate(3px,-3px)}
+.nav-content{max-height:0;overflow:hidden;transition:max-height .3s ease;background:#fff;border-bottom:1px solid var(--accent-light)}
+.nav-content.active{max-height:60vh;overflow-y:auto}
+.nav-list{padding:10px 0}
+.nav-item{display:flex;align-items:center;padding:14px 20px;cursor:pointer;transition:.2s;border-bottom:1px solid rgba(240,232,224,.5)}
+.nav-item:last-child{border-bottom:none}
+.nav-item:active{background:var(--bg-soft)}
+.nav-recipe-name{flex:1;font-size:15px;color:var(--text-main);font-weight:400}
+.nav-badge{font-size:11px;padding:3px 10px;border-radius:12px;background:var(--accent-light);color:var(--secondary-warm);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+
+.section{padding:30px 20px;border-bottom:1px solid var(--accent-light)}
+.section:last-child{border-bottom:none}
+
+.cover{text-align:center;padding:80px 20px;background:linear-gradient(135deg,#fff 0%,var(--bg-soft) 100%);display:flex;flex-direction:column;justify-content:center;min-height:100vh}
+.cover-subtitle{font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:300;color:var(--secondary-warm);margin-bottom:8px;letter-spacing:0.5px}
+.cover-for{font-family:Georgia,'Times New Roman',serif;font-size:16px;font-style:italic;color:var(--text-soft);margin-bottom:8px}
+.cover-name{font-family:Georgia,'Times New Roman',serif;font-size:52px;font-weight:300;color:var(--primary-warm);margin-bottom:40px;line-height:1;letter-spacing:-1px}
+.cover-dedication{margin-bottom:60px}
+.cover-dedication-line{font-size:15px;color:var(--text-soft);line-height:1.6;letter-spacing:0.3px}
+.cover-date{font-size:14px;color:#c5b4a8;letter-spacing:1.5px;text-transform:uppercase}
+
+.letter{background:linear-gradient(to bottom,#fff,var(--bg-soft));padding:50px 25px}
+.letter-content{font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:1.7;color:var(--primary-warm)}
+.letter-content p{margin-bottom:20px}
+.letter-content p:first-child{font-weight:500}
+.letter-signature{margin-top:40px;text-align:right}
+.letter-signature-text{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--secondary-warm);font-style:italic}
+.letter-signature-name{font-family:'Brush Script MT',cursive;font-size:28px;color:var(--primary-warm);margin-top:10px;font-weight:300}
+
+.recipe{padding:0;background:#fff}
+.recipe-image{width:100%;height:220px;position:relative;background:repeating-linear-gradient(45deg,#f5f0ea,#f5f0ea 10px,#e8ddd5 10px,#e8ddd5 20px);overflow:hidden}
+.recipe-image img{width:100%;height:100%;object-fit:cover;display:block}
+
+.recipe-content{padding:20px}
+.recipe-title{font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:400;color:var(--primary-warm);margin-bottom:8px;line-height:1.1;letter-spacing:-.3px}
+
+.recipe-meta{
+display:flex;
+gap:8px;
+font-size:13px;
+color:var(--secondary-warm);
+margin-bottom:12px;
+align-items:center;
+}
+.recipe-meta span:not(:last-child)::after{
+content:'•';
+margin-left:8px;
+color:var(--accent-soft);
+}
+
+.health-benefits{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}
+.benefit-tag{display:inline-flex;align-items:center;gap:6px;background:#fff;padding:6px 12px;border-radius:6px;font-size:11px;letter-spacing:.3px;text-transform:uppercase;color:var(--secondary-warm);border:1px solid var(--accent-light)}
+.benefit-tag::before{content:'';width:4px;height:4px;background:var(--accent-soft);border-radius:50%}
+
+.recipe-personal{font-size:16px;line-height:1.65;color:#6a6a6a;margin-bottom:20px;padding:16px 16px 16px 30px;background:linear-gradient(135deg,var(--bg-soft),#fff);border-radius:10px;position:relative}
+.recipe-personal::before{content:'"';position:absolute;left:12px;top:12px;font-size:22px;color:var(--accent-soft);font-family:Georgia,serif;opacity:.5}
+
+.recipe-block{margin-bottom:22px}
+.recipe-block h4{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--secondary-warm);margin-bottom:10px;font-weight:500}
+
+.ingredients-list{list-style:none}
+.ingredients-list li{display:flex;align-items:center;margin-bottom:8px;font-size:16px;color:var(--text-main);padding:4px 0}
+.ingredient-checkbox{width:22px;height:22px;border:1.5px solid var(--accent-soft);border-radius:5px;margin-right:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.ingredient-checkbox.checked{background:var(--success);border-color:var(--success)}
+.ingredient-checkbox.checked::after{content:'✓';color:#fff;font-size:13px;font-weight:700}
+
+.steps-list{list-style:none;counter-reset:step-counter}
+.steps-list li{counter-increment:step-counter;padding-left:34px;position:relative;margin-bottom:10px;font-size:16px;line-height:1.5;color:var(--text-main);display:flex;align-items:flex-start}
+.steps-list li::before{content:counter(step-counter);position:absolute;left:0;top:2px;width:22px;height:22px;background:linear-gradient(135deg,var(--accent-soft),#c2a491);color:#fff;border-radius:5px;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
+
+.final{padding:60px 20px 40px;background:linear-gradient(135deg,#fff,var(--bg-soft))}
+
+.final-message{text-align:center;margin-bottom:50px}
+.final-message h3{font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:300;color:var(--primary-warm);margin-bottom:20px;line-height:1.3}
+.final-message p{font-size:16px;line-height:1.7;color:#6a6a6a;max-width:380px;margin:0 auto 15px}
+
+.share-section{text-align:center;margin:50px 0}
+.share-prompt{font-size:15px;color:var(--text-soft);margin-bottom:24px}
+.share-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--primary-warm);padding:14px 28px;border:1.5px solid var(--accent-soft);border-radius:12px;text-decoration:none;font-size:15px;font-weight:400;transition:all .3s;cursor:pointer}
+.share-btn:hover{background:var(--bg-soft);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.share-btn:active{transform:translateY(0)}
+.share-btn svg{width:18px;height:18px;fill:var(--primary-warm)}
+
+.final-footer{text-align:center;margin-top:60px}
+.final-signature{font-size:14px;color:var(--text-soft);margin-bottom:8px}
+.final-signature-name{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--secondary-warm);font-style:italic}
+
+@media (max-width:380px){
+.cover-name{font-size:42px}
+.recipe-title{font-size:22px}
+.letter-content{font-size:18px}
+}
+
+@page{size:A4;margin:12mm}
+@media print{
+body{background:#fff!important}
+.container{max-width:none;background:#fff}
+.nav-header{display:none!important}
+.section{padding:0;border:0}
+.recipe{break-inside:avoid;page-break-inside:avoid;margin:0 0 10mm 0}
+.cover{page-break-after:always}
+.final{page-break-before:always}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="nav-header">
+<button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navContent">
+<div class="nav-title">Содержание</div>
+<div class="nav-icon" id="navIcon"><span></span><span></span></div>
+</button>
+<div class="nav-content" id="navContent">
+<div class="nav-list">
+<div class="nav-item" onclick="scrollToRecipe('recipe_brk_010')">
+<div class="nav-recipe-name">Омлет на пару с зеленью</div>
+<div class="nav-badge">Завтрак</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_brk_036')">
+<div class="nav-recipe-name">Пшенная каша с тыквой и орехами</div>
+<div class="nav-badge">Завтрак</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_brk_041')">
+<div class="nav-recipe-name">Творожный мусс с льняным маслом</div>
+<div class="nav-badge">Завтрак</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_brk_003')">
+<div class="nav-recipe-name">Тёплая гречневая каша с яйцом и зеленью</div>
+<div class="nav-badge">Завтрак</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_lch_012')">
+<div class="nav-recipe-name">Свекольный борщ с фасолью</div>
+<div class="nav-badge">Обед</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_lch_033')">
+<div class="nav-recipe-name">Суп-пюре из чечевицы с куркумой</div>
+<div class="nav-badge">Обед</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_lch_013')">
+<div class="nav-recipe-name">Суп-пюре из кабачков и брокколи</div>
+<div class="nav-badge">Обед</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_lch_004')">
+<div class="nav-recipe-name">Треска на пару с брокколи</div>
+<div class="nav-badge">Обед</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_snk_031')">
+<div class="nav-recipe-name">Индейка с брокколи на пару</div>
+<div class="nav-badge">Ужин</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_snk_032')">
+<div class="nav-recipe-name">Творожная запеканка с семенами льна</div>
+<div class="nav-badge">Ужин</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_snk_007')">
+<div class="nav-recipe-name">Запечённая рыба с цветной капустой</div>
+<div class="nav-badge">Ужин</div>
+</div>
+<div class="nav-item" onclick="scrollToRecipe('recipe_snk_034')">
+<div class="nav-recipe-name">Теплая тыква с корицей</div>
+<div class="nav-badge">Ужин</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="section cover">
+<div>
+<div class="cover-subtitle">Книга рецептов</div>
+<div class="cover-for">для</div>
+<div class="cover-name">Анны</div>
+</div>
+
+<div style="width: 60px; height: 1px; background: var(--accent-soft); margin: 40px auto; opacity: 0.5;"></div>
+
+<div class="cover-dedication">
+<div class="cover-dedication-line">Собрана с любовью</div>
+<div class="cover-dedication-line">для вашего здоровья и спокойного сна</div>
+</div>
+
+<div class="cover-date">Ноябрь 2025</div>
+</div>
+
+<div class="section letter">
+<div class="letter-content">
+<p>Дорогая Анна,</p>
+
+<p>Эта книга рецептов создана специально для вас — с учётом каждой особенности вашего здоровья. После стольких лет нарушенного сна ваш организм нуждается в бережной поддержке изнутри.</p>
+
+<p>Ваша печень работает на пределе 24 года — постоянный приём варфарина, отсутствие желчного пузыря, статины. К этому добавилась нестабильная глюкоза и разбалансированные электролиты. Всё это напрямую влияет на качество вашего сна.</p>
+
+<p>Каждый рецепт в этой книге — не просто еда. Это инструмент восстановления. Тыква и свекла поддержат печень. Куркума снимет воспаление. Индейка даст триптофан для выработки мелатонина. Магний из круп успокоит нервную систему.</p>
+
+<p>Важно помнить: вы принимаете варфарин, поэтому количество зелени и брокколи должно быть стабильным каждый день. Не больше, не меньше — именно так, как указано в рецептах.</p>
+
+<p>Готовьте с удовольствием, ешьте с благодарностью к своему телу. Оно уже начинает путь к восстановлению.</p>
+
+<div class="letter-signature">
+<div class="letter-signature-text">С заботой о вашем здоровье,</div>
+<div class="letter-signature-name">Доктор Света</div>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_brk_010">
+<div class="recipe-image">
+<img src="../../../Image/brk_010.jpeg" alt="Омлет на пару с зеленью">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Омлет на пару с зеленью</h3>
+<div class="recipe-meta">
+<span>15 минут</span>
+<span>220 ккал</span>
+<span>1 порция</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Для костей</span>
+<span class="benefit-tag">Легкое пищеварение</span>
+</div>
+<div class="recipe-personal">
+Нежный омлет без капли масла — именно то, что нужно вашей печени по утрам. Приготовление на пару сохраняет все витамины и не даёт лишней нагрузки. Зелень даём строго по рецепту для стабильности варфарина.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="brk_010"></div><span>Яйцо — 2 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_010"></div><span>Молоко — 2 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_010"></div><span>Соль — щепотка</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_010"></div><span>Свежая зелень (укроп или петрушка) — 1 ст.л.</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Взбейте яйца с молоком и солью до однородности.</li>
+<li>Добавьте мелко рубленую зелень и перемешайте.</li>
+<li>Перелейте смесь в форму для пароварки или миску, подходящую для паровой бани.</li>
+<li>Готовьте на пару 10-12 минут до полной готовности.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_brk_036">
+<div class="recipe-image">
+<img src="../../../Image/brk_036.jpeg" alt="Пшенная каша с тыквой и орехами">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Пшенная каша с тыквой и орехами</h3>
+<div class="recipe-meta">
+<span>15 минут</span>
+<span>295 ккал</span>
+<span>1 порция</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Для печени</span>
+<span class="benefit-tag">Энергия</span>
+<span class="benefit-tag">Детокс</span>
+</div>
+<div class="recipe-personal">
+Тыква — ваш главный союзник в восстановлении печени. Она содержит пектины, которые помогают выводить токсины. Пшено даёт медленные углеводы для стабильного сахара, а орехи — магний для спокойствия нервной системы.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="brk_036"></div><span>Пшено — 50г (3 ст.л.)</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_036"></div><span>Тыква — 80г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_036"></div><span>Грецкие орехи — 15г (небольшая горсть)</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_036"></div><span>Вода — 200мл</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_036"></div><span>Мед — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_036"></div><span>Корица — щепотка</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Промойте пшено горячей водой несколько раз до прозрачности — это важно для печени.</li>
+<li>Нарежьте тыкву небольшими кубиками.</li>
+<li>Положите пшено и тыкву в кастрюлю, залейте водой и варите 12 минут до мягкости.</li>
+<li>Измельчите орехи, добавьте в кашу вместе с мёдом и корицей перед подачей.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_brk_041">
+<div class="recipe-image">
+<img src="../../../Image/brk_041.jpeg" alt="Творожный мусс с льняным маслом">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Творожный мусс с льняным маслом</h3>
+<div class="recipe-meta">
+<span>5 минут</span>
+<span>220 ккал</span>
+<span>1 порция</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Гормоны</span>
+<span class="benefit-tag">Сосуды</span>
+<span class="benefit-tag">Для печени</span>
+</div>
+<div class="recipe-personal">
+Льняное масло — один из лучших гепатопротекторов. Оно содержит омега-3, которые снижают воспаление в печени и поддерживают сосуды (важно при варфарине). Творог даёт легкоусвояемый белок без нагрузки на пищеварение.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="brk_041"></div><span>Творог 5% — 150г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_041"></div><span>Льняное масло — 2 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_041"></div><span>Стевия — по вкусу (не мёд!)</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_041"></div><span>Ягоды свежие или замороженные — небольшая горсть</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_041"></div><span>Корица — щепотка</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Взбейте творог блендером до кремовой консистенции. Можно добавить 1 ст.л. воды для мягкости.</li>
+<li>Добавьте льняное масло и стевию, перемешайте.</li>
+<li>Выложите мусс в креманку, украсьте ягодами.</li>
+<li>Посыпьте корицей для стабилизации сахара и подавайте.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_brk_003">
+<div class="recipe-image">
+<img src="../../../Image/brk_003.jpeg" alt="Тёплая гречневая каша с яйцом и зеленью">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Тёплая гречневая каша с яйцом и зеленью</h3>
+<div class="recipe-meta">
+<span>20 минут</span>
+<span>320 ккал</span>
+<span>1 порция</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">ЖКТ</span>
+<span class="benefit-tag">Энергия</span>
+<span class="benefit-tag">Сытость</span>
+</div>
+<div class="recipe-personal">
+Знакомая с детства гречка — идеальная крупа при вашем состоянии. Низкий гликемический индекс не даёт скачков сахара, магний успокаивает нервы. Яйцо добавляет качественный белок. Зелень — строго 1 столовую ложку для стабильности варфарина.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="brk_003"></div><span>Гречка — 3 ст.л. (сухой крупы)</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_003"></div><span>Яйцо — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_003"></div><span>Свежая зелень (укроп или петрушка) — 1 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_003"></div><span>Соль — по вкусу (немного!)</span></li>
+<li><div class="ingredient-checkbox" data-recipe="brk_003"></div><span>Вода для варки</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Промойте гречку и отварите в подсоленной воде 15 минут до готовности.</li>
+<li>Пока каша варится, сварите яйцо всмятку (6 минут) или вкрутую (9 минут) — как любите.</li>
+<li>Выложите готовую кашу в тарелку.</li>
+<li>Разрежьте яйцо, положите сверху, посыпьте мелко рубленой зеленью и подавайте тёплым.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_lch_012">
+<div class="recipe-image">
+<img src="../../../Image/lch_012.jpeg" alt="Свекольный борщ с фасолью">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Свекольный борщ с фасолью</h3>
+<div class="recipe-meta">
+<span>25 минут</span>
+<span>280 ккал</span>
+<span>2 порции</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Детокс печени</span>
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Микрофлора</span>
+</div>
+<div class="recipe-personal">
+Свекла — королева печеночной детоксикации! Она содержит бетаин, который помогает печени восстанавливаться. Вы любите супы, а этот можно готовить сразу на 2 дня — очень удобно. Фасоль даёт растительный белок и клетчатку для хорошего пищеварения.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Свекла средняя — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Капуста белокочанная — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Фасоль консервированная — 80г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Морковь — 0.5 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Лук репчатый — 0.5 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Томатная паста — 1 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Вода — 500мл</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Соль — минимально</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_012"></div><span>Сметана для подачи — 1 ст.л.</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Натрите свеклу и морковь на крупной тёрке, мелко нарежьте лук.</li>
+<li>В кастрюле с 1 ч.л. растительного масла слегка обжарьте лук, добавьте морковь и свеклу, тушите 3 минуты.</li>
+<li>Добавьте воду и доведите до кипения.</li>
+<li>Нашинкуйте капусту, положите в кастрюлю вместе с промытой фасолью. Варите 15 минут.</li>
+<li>Добавьте томатную пасту, минимум соли, варите ещё 5 минут.</li>
+<li>Подавайте с ложкой сметаны — так вкуснее и полезнее для усвоения.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_lch_033">
+<div class="recipe-image">
+<img src="../../../Image/lch_033.jpeg" alt="Суп-пюре из чечевицы с куркумой">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Суп-пюре из чечевицы с куркумой</h3>
+<div class="recipe-meta">
+<span>20 минут</span>
+<span>320 ккал</span>
+<span>2 порции</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Железо</span>
+<span class="benefit-tag">Суставы</span>
+<span class="benefit-tag">Иммунитет</span>
+</div>
+<div class="recipe-personal">
+Куркума — мощное противовоспалительное средство для вашей печени и всего организма. Чечевица даёт растительный белок и железо. Этот согревающий суп можно готовить на 2-3 дня, он отлично хранится в холодильнике.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="lch_033"></div><span>Красная чечевица — 80г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_033"></div><span>Морковь — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_033"></div><span>Лук репчатый — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_033"></div><span>Куркума — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_033"></div><span>Вода — 500мл</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_033"></div><span>Растительное масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_033"></div><span>Соль — минимально</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_033"></div><span>Чёрный перец — щепотка (для усвоения куркумы)</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Мелко нарежьте лук и морковь.</li>
+<li>В кастрюле разогрейте масло, добавьте лук, куркуму и чёрный перец. Обжаривайте 2 минуты на слабом огне.</li>
+<li>Добавьте морковь, промытую чечевицу и воду.</li>
+<li>Варите 15 минут до полной мягкости чечевицы.</li>
+<li>Пюрируйте блендером до кремовой консистенции. Если слишком густо — добавьте немного воды.</li>
+<li>Подавайте тёплым. Можно добавить 1 ч.л. оливкового масла сверху.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_lch_013">
+<div class="recipe-image">
+<img src="../../../Image/lch_013.jpeg" alt="Суп-пюре из кабачков и брокколи">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Суп-пюре из кабачков и брокколи</h3>
+<div class="recipe-meta">
+<span>20 минут</span>
+<span>260 ккал</span>
+<span>2 порции</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Иммунитет</span>
+<span class="benefit-tag">Детокс</span>
+<span class="benefit-tag">Пищеварение</span>
+</div>
+<div class="recipe-personal">
+Брокколи — чемпион по поддержке иммунитета и очищению печени. Лёгкий, нежный суп-пюре без сливок — именно то, что нужно при отсутствии желчного пузыря. Брокколи здесь 100г — это стандартная порция для стабильности варфарина.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="lch_013"></div><span>Кабачок — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_013"></div><span>Брокколи — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_013"></div><span>Картофель — 0.5 шт. среднего размера</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_013"></div><span>Вода — 300мл</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_013"></div><span>Оливковое масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_013"></div><span>Укроп свежий — для подачи</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_013"></div><span>Соль — по вкусу (немного)</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Нарежьте кабачок и картофель кубиками, разберите брокколи на соцветия.</li>
+<li>Положите овощи в кастрюлю, залейте водой и варите 15 минут до полной мягкости.</li>
+<li>Пюрируйте блендером до однородной кремовой консистенции.</li>
+<li>Добавьте оливковое масло, перемешайте.</li>
+<li>Посыпьте свежим укропом перед подачей.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_lch_004">
+<div class="recipe-image">
+<img src="../../../Image/lch_004.jpeg" alt="Треска на пару с брокколи">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Треска на пару с брокколи</h3>
+<div class="recipe-meta">
+<span>15 минут</span>
+<span>280 ккал</span>
+<span>1 порция</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Сердце</span>
+<span class="benefit-tag">Иммунитет</span>
+<span class="benefit-tag">Детокс</span>
+</div>
+<div class="recipe-personal">
+Приготовление на пару — самый безопасный метод для вашей печени. Треска даёт омега-3 для поддержки сосудов (важно при варфарине!), брокколи — 80г для стабильности. Всего 15 минут готовки, а пользы — на весь день.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="lch_004"></div><span>Филе трески — 150г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_004"></div><span>Брокколи — 80г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_004"></div><span>Морковь — 0.5 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_004"></div><span>Лимонный сок — несколько капель</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_004"></div><span>Соль — щепотка</span></li>
+<li><div class="ingredient-checkbox" data-recipe="lch_004"></div><span>Сушёные травы (укроп, базилик) — по вкусу</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Разберите брокколи на соцветия, морковь нарежьте кружочками.</li>
+<li>Приправьте треску солью и травами, сбрызните лимонным соком.</li>
+<li>Положите рыбу и овощи в пароварку (или на дуршлаг над кастрюлей с кипящей водой).</li>
+<li>Готовьте 15 минут до готовности рыбы.</li>
+<li>Подавайте сразу, можно добавить 1 ч.л. оливкового масла.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_snk_031">
+<div class="recipe-image">
+<img src="../../../Image/snk_031.jpeg" alt="Индейка с брокколи на пару">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Индейка с брокколи на пару</h3>
+<div class="recipe-meta">
+<span>20 минут</span>
+<span>220 ккал</span>
+<span>1 порция</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Для сна</span>
+<span class="benefit-tag">Белок</span>
+<span class="benefit-tag">Детокс</span>
+</div>
+<div class="recipe-personal">
+Это ваш главный вечерний рецепт! Индейка содержит триптофан — аминокислоту, из которой организм вырабатывает мелатонин для сна. Приготовление на пару не нагружает печень. Ешьте в 17:00-18:00 для лучшего эффекта.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="snk_031"></div><span>Филе индейки — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_031"></div><span>Брокколи — 150г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_031"></div><span>Лимонный сок — 1 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_031"></div><span>Оливковое масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_031"></div><span>Соль — минимально</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_031"></div><span>Сушёные травы — по вкусу</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Нарежьте индейку небольшими кусочками (примерно 3×3 см).</li>
+<li>Разберите брокколи на средние соцветия.</li>
+<li>Приправьте индейку солью и травами.</li>
+<li>Положите мясо и брокколи в пароварку, готовьте 15 минут.</li>
+<li>Переложите на тарелку, полейте лимонным соком и оливковым маслом.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_snk_032">
+<div class="recipe-image">
+<img src="../../../Image/snk_032.jpeg" alt="Творожная запеканка с семенами льна">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Творожная запеканка с семенами льна</h3>
+<div class="recipe-meta">
+<span>25 минут</span>
+<span>240 ккал</span>
+<span>2 порции</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Гормоны</span>
+<span class="benefit-tag">Для сна</span>
+<span class="benefit-tag">Сосуды</span>
+</div>
+<div class="recipe-personal">
+Семена льна — печеночный детокс плюс омега-3 для сосудов. Творог даёт триптофан для выработки мелатонина. Можно приготовить на 2 дня и есть на ужин. Важно: используем стевию, не мёд, чтобы не было сахарного скачка вечером.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="snk_032"></div><span>Творог 5% — 200г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_032"></div><span>Яйцо — 1 шт.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_032"></div><span>Семена льна молотые — 2 ст.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_032"></div><span>Ванилин — щепотка</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_032"></div><span>Стевия — по вкусу (не мёд!)</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Смешайте творог с яйцом до однородности (можно вилкой или блендером).</li>
+<li>Добавьте молотые семена льна, ванилин и стевию. Хорошо перемешайте.</li>
+<li>Выложите массу в форму для запекания (можно смазать каплей масла).</li>
+<li>Выпекайте 20 минут при 180°C до золотистой корочки.</li>
+<li>Дайте немного остыть и подавайте тёплой или холодной.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_snk_007">
+<div class="recipe-image">
+<img src="../../../Image/snk_007.jpeg" alt="Запечённая рыба с цветной капустой">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Запечённая рыба с цветной капустой</h3>
+<div class="recipe-meta">
+<span>25 минут</span>
+<span>240 ккал</span>
+<span>1 порция</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Сердце</span>
+<span class="benefit-tag">Сосуды</span>
+<span class="benefit-tag">Для сна</span>
+</div>
+<div class="recipe-personal">
+Запекание — безопасный метод для печени, без лишнего жира. Рыба даёт омега-3 для снижения воспаления и поддержки сосудов (критично при варфарине). Цветная капуста помогает детоксикации. Лёгкий, нежный ужин для спокойного сна.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="snk_007"></div><span>Филе трески или хека — 130г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_007"></div><span>Цветная капуста — 100г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_007"></div><span>Лимонный сок — несколько капель</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_007"></div><span>Оливковое масло — 1 ч.л.</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_007"></div><span>Соль — минимально</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_007"></div><span>Сушёные травы — по вкусу</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Разберите цветную капусту на небольшие соцветия.</li>
+<li>Выложите рыбу и капусту в форму для запекания.</li>
+<li>Сбрызните лимонным соком и оливковым маслом, посыпьте солью и травами.</li>
+<li>Запекайте 20 минут при 180°C до готовности рыбы.</li>
+<li>Подавайте сразу, можно с долькой лимона.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section recipe" id="recipe_snk_034">
+<div class="recipe-image">
+<img src="../../../Image/snk_034.jpeg" alt="Теплая тыква с корицей">
+</div>
+<div class="recipe-content">
+<h3 class="recipe-title">Теплая тыква с корицей</h3>
+<div class="recipe-meta">
+<span>20 минут</span>
+<span>140 ккал</span>
+<span>1 порция</span>
+</div>
+<div class="health-benefits">
+<span class="benefit-tag">Иммунитет</span>
+<span class="benefit-tag">Для сна</span>
+<span class="benefit-tag">Детокс печени</span>
+</div>
+<div class="recipe-personal">
+Тыква — гепатопротектор номер один! Корица стабилизирует сахар (важно при вашей глюкозе 7.0). Это лёгкий вечерний вариант, но ешьте строго в 17:00-18:00, не позже — тыква сладковатая. Согревает и успокаивает перед сном.
+</div>
+
+<div class="recipe-block">
+<h4>Ингредиенты</h4>
+<ul class="ingredients-list">
+<li><div class="ingredient-checkbox" data-recipe="snk_034"></div><span>Тыква — 200г</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_034"></div><span>Корица — по вкусу</span></li>
+<li><div class="ingredient-checkbox" data-recipe="snk_034"></div><span>Масло гхи или оливковое — 1 ч.л.</span></li>
+</ul>
+</div>
+
+<div class="recipe-block">
+<h4>Приготовление</h4>
+<ol class="steps-list">
+<li>Нарежьте тыкву кубиками примерно 2×2 см.</li>
+<li>Выложите в форму для запекания, посыпьте корицей, сбрызните маслом.</li>
+<li>Запекайте 20 минут при 180°C до мягкости и лёгкой карамелизации.</li>
+<li>Подавайте тёплой. Можно есть как самостоятельное блюдо или добавить к творогу.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div class="section final">
+<div class="final-message">
+<h3>Это только начало вашего пути к здоровому сну</h3>
+<p>Каждый рецепт в этой книге — шаг к восстановлению. Ваша печень получит поддержку, сахар стабилизируется, нервная система успокоится.</p>
+<p>Помните: постоянство важнее скорости. Готовьте с удовольствием, ешьте осознанно, и результат обязательно придёт.</p>
+<p>Ваше тело мудрое — оно знает, как восстанавливаться. Просто дайте ему правильные инструменты.</p>
+</div>
+
+<div class="share-section">
+<div class="share-prompt">Если книга вам понравилась, поделитесь ею с близкими</div>
+<button class="share-btn" onclick="shareRecipeBook()" type="button">
+<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+<span>Поделиться с близкими</span>
+</button>
+</div>
+
+<div class="final-footer">
+<div class="final-signature">С заботой о вашем здоровье,</div>
+<div class="final-signature-name">Доктор Света</div>
+</div>
+</div>
+
+</div>
+
+<script>
+const STATE_KEY = 'recipeBook_state_v3';
+
+function toggleNav(){
+const navContent=document.getElementById('navContent');
+const navIcon=document.getElementById('navIcon');
+const toggle=document.getElementById('navToggle');
+const open=!navContent.classList.contains('active');
+navContent.classList.toggle('active');
+navIcon.classList.toggle('active');
+toggle.setAttribute('aria-expanded',open?'true':'false');
+}
+
+function scrollToRecipe(recipeId){
+const nav=document.getElementById('navContent');
+const icon=document.getElementById('navIcon');
+nav.classList.remove('active');
+icon.classList.remove('active');
+document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
+const el=document.getElementById(recipeId);
+if(!el) return;
+const y=el.getBoundingClientRect().top+window.pageYOffset;
+const offset=y-document.querySelector('.nav-header').offsetHeight;
+window.scrollTo({top:offset,behavior:'smooth'});
+}
+
+function saveState(){
+const state={ingredients:[]};
+document.querySelectorAll('.ingredient-checkbox.checked').forEach(cb=>{
+const recipeId=cb.dataset.recipe;
+const index=Array.from(cb.parentElement.parentElement.children).indexOf(cb.parentElement);
+state.ingredients.push(`${recipeId}-${index}`);
+});
+localStorage.setItem(STATE_KEY,JSON.stringify(state));
+}
+
+function restoreState(){
+const savedRaw=localStorage.getItem(STATE_KEY);
+if(!savedRaw) return;
+try{
+const state=JSON.parse(savedRaw);
+(state.ingredients||[]).forEach(id=>{
+const [rid,idx]=id.split('-');
+const boxes=document.querySelectorAll(`.ingredient-checkbox[data-recipe="${rid}"]`);
+if(boxes[idx]) boxes[idx].classList.add('checked');
+});
+}catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+const t=document.getElementById('navToggle');
+if(t){
+t.addEventListener('click',toggleNav);
+t.addEventListener('keydown',e=>{
+if(e.key==='Enter'||e.key===' '){
+e.preventDefault();
+toggleNav();
+}
+});
+}
+
+document.querySelectorAll('.ingredient-checkbox').forEach(cb=>{
+cb.addEventListener('click',function(e){
+e.stopPropagation();
+this.classList.toggle('checked');
+saveState();
+});
+});
+
+restoreState();
+});
+
+function shareRecipeBook(){
+if(navigator.share){
+navigator.share({
+title:'Моя книга рецептов',
+text:'Персональная книга рецептов для здорового питания',
+url:window.location.href
+}).catch(()=>{});
+}else{
+navigator.clipboard.writeText(window.location.href).then(()=>alert('Ссылка скопирована!'));
+}
+}
+</script>
+
+</body>
+</html>
